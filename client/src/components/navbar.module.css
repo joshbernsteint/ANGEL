@@ -1,0 +1,22 @@
+.nav {
+    background-color: rgb(0, 127, 231);
+}
+
+.nav_brand {
+    font-size: x-large;
+    color: black;
+    font-weight: 700;
+}
+
+.nav_item {
+    color:black;
+    font-size: large;
+    transition: translate ease-in-out 100ms;
+    font-weight: 500;
+}
+
+.nav_item:hover,.nav-item:focus{
+    border-bottom: 1px solid white;
+    color: rgb(255, 255, 255);
+    translate: 0 -3px;
+}
