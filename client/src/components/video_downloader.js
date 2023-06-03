@@ -1,5 +1,5 @@
 import "../App.css"
-import { Button, Form, Stack, Modal, Accordion, Dropdown, DropdownButton, OverlayTrigger, Popover } from "react-bootstrap";
+import { Button, Form, Stack, Modal, Accordion, Dropdown, DropdownButton, OverlayTrigger, Popover, Overlay } from "react-bootstrap";
 import fileDownload from 'react-file-download'
 import { Navigate } from 'react-router-dom'
 import { useRef, useState, useEffect } from "react";
@@ -16,30 +16,30 @@ function Video_downloader(){
     const [videoData, setVideoData] = useState({});
     const [show, setShow] = useState(false)
     const [videoTime, setVideoTime] = useState('');
-    const [videoType, setVideoType] = useState('.mp4');
-    const [qualityOptions, setQualityOptions] = useState([]);
-    const [videoQuality, setVideoQuality] = useState('Loading...')
+    const [videoType, setVideoType] = useState('mp4');
+    const [qualityOptions, setQualityOptions] = useState({});
+    const [videoQuality, setVideoQuality] = useState('')
+    const [itag, setItag] = useState(0);
     const [nameError, setNameError] = useState(false);
 
 
-    const handleClose = () => setShow(false);
-    const handleShow = () => setShow(true);
+    const handleClose = () => {setNameError(true);setShow(false);}
+    const handleShow = () => {setNameError(true);setShow(true)};
 
 
-    function ShowQuality(props){
-        const qualities = props.options
-        if(videoQuality === 'Loading...'){
-            setVideoQuality(qualities[0].quality)
-            return (
-                `${qualities[0].quality}`
-            );
-        }
-        else{
-            return (
-                `${videoQuality}`
-            );
-        }
-        
+
+
+
+    async function downloadVideo(){
+        console.log(itag)
+        console.log(nameRef.current.value);
+        console.log(videoType);
+        console.log(videoData.id)
+
+
+        window.open(`http://localhost:5000/video/${videoData.id}/${itag}/${nameRef.current.value}/${videoType}`)
+
+    
     }
 
     async function getVideoData(e){
@@ -68,17 +68,25 @@ function Video_downloader(){
             const minutes = Math.floor(seconds / 60);
             seconds %= 60;
             setVideoTime(`${hours}:${minutes}:${seconds}`)
-            let options = [];
+
+            //Getting diffferent quality options
+            let w_options = [];
+            let m_options = [];
             video_data.video_options.forEach((element) => {
                 const v_quality = element.quality;
                 const itag = element.itag
                 const type = element.video_type;
                 if(type === 'webm'){
-                    options.push({quality: v_quality, itag: itag})
+                    w_options.push({quality: v_quality, itag: itag})
+                }
+                else{
+                    m_options.push({quality: v_quality, itag: itag})
                 }
             })
-
-            setQualityOptions(options);
+            setVideoQuality(m_options[0].quality);
+            setItag(m_options[0].itag);
+            setQualityOptions({mp4: m_options, webm: w_options});
+            console.log(qualityOptions)
             handleShow()
             
             // window.open(`http://localhost:5000/video/${responseData.data.id}/high`)
@@ -125,24 +133,35 @@ function Video_downloader(){
                     <br/>
                         <Form>
                         <Form.Group>
-                            <Form.Control type="text" placeholder="Enter name for file" ref={nameRef} style={{width: "50%",display: "inline"}} required/>
-                            <DropdownButton id="dropdown-basic-button" title={videoType} style={{width: "10%",display: "inline"}}  variant="success">
+                            <OverlayTrigger show={!nameError} defaultShow={false} placement="bottom" delay={{show:250, hide: 400}} overlay={(
+                                <Popover id="popover-basic">
+                                <Popover.Header as="h3" style={{color: "red"}}>File Name Error</Popover.Header>
+                                <Popover.Body>
+                                  Please Input a valid file name
+                                </Popover.Body>
+                              </Popover>
+                            )}>
+                                <Form.Control type="text" placeholder="Enter name for file" ref={nameRef} style={{width: "50%",display: "inline"}} required/>
+                            </OverlayTrigger>
+                            <DropdownButton id="dropdown-basic-button" title={`.${videoType}`} style={{width: "10%",display: "inline"}}  variant="success">
                                 <Dropdown.ItemText><b>Native Formats</b></Dropdown.ItemText>
-                                <Dropdown.Item onClick={() => setVideoType('.mp4')}>.mp4</Dropdown.Item>
-                                <Dropdown.Item onClick={() => setVideoType('.webm')}>.webm</Dropdown.Item>
+                                <Dropdown.Item onClick={() => {setVideoType('mp4'); setVideoQuality(qualityOptions.mp4[0].quality); setItag(qualityOptions.mp4[0].itag)}}>.mp4</Dropdown.Item>
+                                <Dropdown.Item onClick={() => {setVideoType('webm'); setVideoQuality(qualityOptions.webm[0].quality); setItag(qualityOptions.webm[0].itag)}}>.webm</Dropdown.Item>
                                 <Dropdown.Divider/>
                                 <Dropdown.ItemText><b>Other Formats</b></Dropdown.ItemText>
-                                <Dropdown.Item onClick={() => setVideoType('.mkv')}>.mkv</Dropdown.Item>
-                                <Dropdown.Item onClick={() => setVideoType('.mov')}>.mov</Dropdown.Item>
+                                <Dropdown.Item onClick={() => {setVideoType('mkv'); setVideoQuality(qualityOptions.webm[0].quality); setItag(qualityOptions.webm[0].itag)}}>.mkv</Dropdown.Item>
+                                <Dropdown.Item onClick={() => {setVideoType('mov'); setVideoQuality(qualityOptions.webm[0].quality); setItag(qualityOptions.webm[0].itag)}}>.mov</Dropdown.Item>
                             </DropdownButton>
                             {' '}
                             {/* For choosing Video Quality */}
-                            <DropdownButton id="dropdown-basic-button" title={<ShowQuality options = {qualityOptions}/>} style={{width: "40",display: "inline"}}  variant="info">
-                                {qualityOptions.map((element, i) => (
-                                    <Dropdown.Item key = {i} onClick={() => setVideoQuality(element.quality)}>{element.quality}</Dropdown.Item>
-                                ))}
-
-                                
+                            <DropdownButton id="dropdown-basic-button" title={videoQuality} style={{width: "40",display: "inline"}}  variant="info">
+                                {(qualityOptions.mp4 && qualityOptions.webm) ? (
+                                    videoType==='webm' ? (qualityOptions.webm).map((element,i) => (
+                                        <Dropdown.Item key={i} onClick={() => {setVideoQuality(element.quality); setItag(element.itag)}}>{element.quality}</Dropdown.Item>
+                                    )) : (qualityOptions.mp4).map((element,i) => (
+                                        <Dropdown.Item key={i} onClick={() => {setVideoQuality(element.quality); setItag(element.itag)}}>{element.quality}</Dropdown.Item>
+                                    ))
+                                ) : ("Loading...")}
                             </DropdownButton>
                         </Form.Group>
                     </Form>
@@ -151,7 +170,18 @@ function Video_downloader(){
                 <Button variant="danger" onClick={handleClose}>
                     Cancel
                 </Button>
-                <Button variant="primary" type="Submit" onClick={(e) => {e.preventDefault();console.log('submitted!')}}>Download</Button>
+                <Button variant="primary" type="Submit" onClick={(e) => {
+                    e.preventDefault();
+                    if(nameRef.current.value === ""){
+                        setNameError(false)
+                        console.log("Error: File must have valid name")
+                    }
+                    else{
+                        setNameError(true);
+                        downloadVideo();
+                    }
+                
+                }}>Download</Button>
                 </Modal.Footer>
             </Modal>
         </div>

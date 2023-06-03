@@ -52,10 +52,9 @@ app.get('/get_data', async (req,res) => {
 })
 
 //For downloading a video
-app.get('/video/:id/:qual', async (req,res) => {
-    console.log(req.params.qual)
+app.get('/video/:id/:itag/:name/:format', async (req,res) => {
     const audio = ytdl(req.params.id, { quality: 'highestaudio' });
-    const video = ytdl(req.params.id, { quality: 'highestvideo' });
+    const video = ytdl(req.params.id, { quality: req.params.itag });
     const ffmpegProcess = cp.spawn(ffmpeg, [
         // Remove ffmpeg's console spamming
         '-loglevel', '8', '-hide_banner',
@@ -70,7 +69,7 @@ app.get('/video/:id/:qual', async (req,res) => {
         // Keep encoding
         '-c:v', 'copy',
         // Define output file
-        `${req.params.id}.mp4`,
+        `${req.params.name}.${req.params.format}`,
       ], {
         windowsHide: true,
         stdio: [
@@ -82,18 +81,15 @@ app.get('/video/:id/:qual', async (req,res) => {
       });
     audio.pipe(ffmpegProcess.stdio[4]);
     video.pipe(ffmpegProcess.stdio[5]);
-    ffmpegProcess.on('start',() => {
-        console.log(`Started downloading video ID ${req.params.id}`)
-    })
     ffmpegProcess.on('close', async () => {
         console.log(`Done downloading video ID ${req.params.id}`)
-        res.download(path.resolve(`./${req.params.id}.mp4`), (err) => {
+        res.download(path.resolve(`./${req.params.name}.${req.params.format}`), (err) => {
             if(err){
                 console.log(err)
             }
             else{
                 console.log(`Deleting File ${req.params.id}`)
-                fs.unlinkSync(path.resolve(`./${req.params.id}.mp4`));
+                fs.unlinkSync(path.resolve( `./${req.params.name}.${req.params.format}`));
 
             }
         })
