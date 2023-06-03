@@ -1,5 +1,5 @@
 import "../App.css"
-import { Button, Form, Stack, Modal, Accordion, Dropdown, DropdownButton, OverlayTrigger, Popover, Overlay } from "react-bootstrap";
+import { Button, Form, Stack, Modal, Accordion, Dropdown, DropdownButton, OverlayTrigger, Popover, CloseButton } from "react-bootstrap";
 import fileDownload from 'react-file-download'
 import { Navigate } from 'react-router-dom'
 import { useRef, useState, useEffect } from "react";
@@ -21,6 +21,7 @@ function Video_downloader(){
     const [videoQuality, setVideoQuality] = useState('')
     const [itag, setItag] = useState(0);
     const [nameError, setNameError] = useState(false);
+    const [audioQuality, setAudioQuality] = useState('High')
 
 
     const handleClose = () => {setNameError(true);setShow(false);}
@@ -31,15 +32,7 @@ function Video_downloader(){
 
 
     async function downloadVideo(){
-        console.log(itag)
-        console.log(nameRef.current.value);
-        console.log(videoType);
-        console.log(videoData.id)
-
-
-        window.open(`http://localhost:5000/video/${videoData.id}/${itag}/${nameRef.current.value}/${videoType}`)
-
-    
+        window.open(`http://localhost:5000/video/${videoData.id}/${itag}/${nameRef.current.value}/${videoType}/${audioQuality}`,"_blank")
     }
 
     async function getVideoData(e){
@@ -122,22 +115,24 @@ function Video_downloader(){
                     <h5 style={{display: "inline"}}>Title: </h5><p style={{display: "inline"}}>{videoData.title}</p><br/>
                     <h5 style={{display: "inline"}}>Length: </h5><p style={{display: "inline"}}>{videoTime}</p><br/>
                     <h5 style={{display: "inline"}}>Video ID: </h5><p style={{display: "inline"}}>{videoData.id}</p><br/>
-                    {(!videoData.desc) ? (<h5 style={{color: "red"}}>No Description</h5>) : (
+                    {(!videoData.desc) ? (<h5 style={{color: "red"}}>Description: None</h5>) : (
                         <Accordion>
                             <Accordion.Item eventKey="0">
                                 <Accordion.Header><h6>Description</h6></Accordion.Header>
-                                <Accordion.Body>{videoData.desc}</Accordion.Body>
+                                <Accordion.Body style={{margin: "2%", overflowX: "auto"}}>{videoData.desc}</Accordion.Body>
                             </Accordion.Item>
                         </Accordion>
                     )}
                     <br/>
+                    <hr/>
+                        <h4>File Name</h4>
                         <Form>
                         <Form.Group>
                             <OverlayTrigger show={!nameError} defaultShow={false} placement="bottom" delay={{show:250, hide: 400}} overlay={(
                                 <Popover id="popover-basic">
-                                <Popover.Header as="h3" style={{color: "red"}}>File Name Error</Popover.Header>
+                                <Popover.Header as="h3" style={{color: "red"}}>File Name Error{' '}<CloseButton onClick={() => setNameError(true)}/></Popover.Header>
                                 <Popover.Body>
-                                  Please Input a valid file name
+                                  <p>Please Input a valid file name</p>
                                 </Popover.Body>
                               </Popover>
                             )}>
@@ -153,18 +148,32 @@ function Video_downloader(){
                                 <Dropdown.Item onClick={() => {setVideoType('mov'); setVideoQuality(qualityOptions.webm[0].quality); setItag(qualityOptions.webm[0].itag)}}>.mov</Dropdown.Item>
                             </DropdownButton>
                             {' '}
-                            {/* For choosing Video Quality */}
-                            <DropdownButton id="dropdown-basic-button" title={videoQuality} style={{width: "40",display: "inline"}}  variant="info">
-                                {(qualityOptions.mp4 && qualityOptions.webm) ? (
-                                    videoType==='webm' ? (qualityOptions.webm).map((element,i) => (
-                                        <Dropdown.Item key={i} onClick={() => {setVideoQuality(element.quality); setItag(element.itag)}}>{element.quality}</Dropdown.Item>
-                                    )) : (qualityOptions.mp4).map((element,i) => (
-                                        <Dropdown.Item key={i} onClick={() => {setVideoQuality(element.quality); setItag(element.itag)}}>{element.quality}</Dropdown.Item>
-                                    ))
-                                ) : ("Loading...")}
-                            </DropdownButton>
                         </Form.Group>
                     </Form>
+                    <br/>
+                    <h4>Quality Options</h4>
+                    {/* For choosing Video Quality */}
+                    <Stack gap={2}>
+                        <Stack direction="horizontal" gap={3}>
+                            <h5 style={{display: "inline"}}>Video: </h5>
+                            <DropdownButton id="dropdown-basic-button" title={videoQuality} variant="info" style={{display: "inline"}}>
+                                        {(qualityOptions.mp4 && qualityOptions.webm) ? (
+                                            videoType==='webm' ? (qualityOptions.webm).map((element,i) => (
+                                                <Dropdown.Item key={i} onClick={() => {setVideoQuality(element.quality); setItag(element.itag)}}>{element.quality} (Itag: {element.itag})</Dropdown.Item>
+                                            )) : (qualityOptions.mp4).map((element,i) => (
+                                                <Dropdown.Item key={i} onClick={() => {setVideoQuality(element.quality); setItag(element.itag)}}>{element.quality} (Itag: {element.itag})</Dropdown.Item>
+                                            ))
+                                        ) : ("Loading...")}
+                            </DropdownButton>
+                        </Stack>
+                            <Stack direction="horizontal" gap={3}>
+                                <h5 style={{display: "inline"}}>Audio: </h5>
+                                <DropdownButton id="dropdown-basic-button" title={audioQuality} variant="info" style={{display: "inline"}}>
+                                    <Dropdown.Item onClick={() => setAudioQuality('High')}>High</Dropdown.Item>
+                                    <Dropdown.Item onClick={() => setAudioQuality('Low')}>Low</Dropdown.Item>
+                                </DropdownButton>
+                            </Stack>
+                    </Stack> 
                 </Modal.Body>
                 <Modal.Footer>
                 <Button variant="danger" onClick={handleClose}>
@@ -179,6 +188,7 @@ function Video_downloader(){
                     else{
                         setNameError(true);
                         downloadVideo();
+                        handleClose();
                     }
                 
                 }}>Download</Button>

@@ -52,8 +52,8 @@ app.get('/get_data', async (req,res) => {
 })
 
 //For downloading a video
-app.get('/video/:id/:itag/:name/:format', async (req,res) => {
-    const audio = ytdl(req.params.id, { quality: 'highestaudio' });
+app.get('/video/:id/:itag/:name/:format/:audio', async (req,res) => {
+    const audio = (req.params.audio === "High") ?  ytdl(req.params.id, { quality: 'highestaudio' }): ytdl(req.params.id, { quality: 'lowestaudio' })
     const video = ytdl(req.params.id, { quality: req.params.itag });
     const ffmpegProcess = cp.spawn(ffmpeg, [
         // Remove ffmpeg's console spamming
@@ -98,7 +98,7 @@ app.get('/video/:id/:itag/:name/:format', async (req,res) => {
 
 //For downloading audio
 app.get('/audio/:id/:qual', async (req,res) => {
-    const audio = ytdl(req.params.id, { quality: 'highestaudio' });
+    const audio = (req.params.qual === "High") ?  ytdl(req.params.id, { quality: 'highestaudio' }): ytdl(req.params.id, { quality: 'lowestaudio' })
     const ffmpegProcess = cp.spawn(ffmpeg, [
         // Remove ffmpeg's console spamming
         '-loglevel', '8', '-hide_banner',
