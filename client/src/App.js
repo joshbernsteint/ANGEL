@@ -12,6 +12,7 @@ import "./App.css"
 import Audio_downloader from './components/audio_downloader';
 import Video_downloader from './components/video_downloader';
 import Converter from './components/converter';
+import Settings from './components/settings';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path="/audio_downloader" element={<Audio_downloader/>}/>
           <Route path="/video_downloader" element={<Video_downloader/>}/>
           <Route path="/converter" element={<Converter/>}/>
+          <Route path="/settings" element={<Settings/>}/>
           <Route path = "*" element = {<Navigate to = "/" />}/>
         </Routes>
       </Router>

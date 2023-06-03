@@ -25,6 +25,11 @@ function Nav_bar(){
                         <Nav.Link href="/video_downloader" className={styles.nav_item}>Video Downloader</Nav.Link>
                         <Nav.Link href="/converter" className={styles.nav_item}>Converter</Nav.Link>
                         <Nav.Link href="https://github.com/joshbernsteint/YouTube_Downloader" target="_blank" className={styles.nav_item}>GitHub Source</Nav.Link>
+                        <Nav.Link href="/settings" className={styles.nav_item}>
+                            <img src="/settings.png"
+                            width="30"
+                            height="30"/>
+                            </Nav.Link>
                     </Nav>
                 </Navbar.Collapse>
 
