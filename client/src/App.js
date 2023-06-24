@@ -1,31 +1,46 @@
 import React from 'react'
 import {
-  BrowserRouter as Router,
-  Route,
+  HashRouter as Router,
   Routes,
-  Navigate,
+  Route,
 } from "react-router-dom";
-import Home from './components/home';
+import {
+  createHashRouter,
+  RouterProvider
+} from 'react-router-dom';
 import "bootstrap/dist/css/bootstrap.min.css";
 import Nav_bar from './components/navbar';
 import "./App.css"
+import Home from './components/home';
 import Audio_downloader from './components/audio_downloader';
 import Video_downloader from './components/video_downloader';
 import Converter from './components/converter';
 import Settings from './components/settings';
 
+
+const router = createHashRouter([
+  {
+    path: "/*",
+    element: <Home />,
+  },
+  {
+    path: "/audio_downloader",
+    element: <Audio_downloader/>,
+  },
+]);
+
 function App() {
   return (
     <div className='main'>
       <Nav_bar/>
-      <Router>
+      {/* <RouterProvider router={router}/> */}
+      <Router basename={process.env.PUBLIC_URL + "/"}>
         <Routes>
-          <Route path="/" element={<Home/>}/>
-          <Route path="/audio_downloader" element={<Audio_downloader/>}/>
-          <Route path="/video_downloader" element={<Video_downloader/>}/>
-          <Route path="/converter" element={<Converter/>}/>
-          <Route path="/settings" element={<Settings/>}/>
-          <Route path = "*" element = {<Navigate to = "/" />}/>
+          <Route path="/" exact Component={ Home }/>
+          <Route path="/audio_downloader" Component={ Audio_downloader }/>
+          <Route path="/video_downloader" Component={ Video_downloader }/>
+          <Route path="/converter" Component={ Converter }/>
+          <Route path="/settings" Component={ Settings}/>
         </Routes>
       </Router>
     </div>

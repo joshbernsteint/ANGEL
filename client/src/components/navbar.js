@@ -10,7 +10,7 @@ function Nav_bar(){
                 <Navbar.Brand href="/" className={styles.nav_brand}>
                     <img
                     alt=""
-                    src="/icon.ico"
+                    src="./icon.ico"
                     width="35"
                     height="35"
                     className="d-inline-block align-top"
@@ -21,12 +21,12 @@ function Nav_bar(){
                 <Navbar.Collapse id = "basic-navbar-nav" style = {{alignItems: "right",justifyContent:"right"}}>
                     <Nav className={`my-1 my-lg-2`} navbarScroll>
                         <Nav.Link href="/" className={styles.nav_item}>Home</Nav.Link>
-                        <Nav.Link href="/audio_downloader" className={styles.nav_item}>Audio Downloader</Nav.Link>
-                        <Nav.Link href="/video_downloader" className={styles.nav_item}>Video Downloader</Nav.Link>
-                        <Nav.Link href="/converter" className={styles.nav_item}>Converter</Nav.Link>
+                        <Nav.Link href="/#/audio_downloader" className={styles.nav_item}>Audio Downloader</Nav.Link>
+                        <Nav.Link href="/#/video_downloader" className={styles.nav_item}>Video Downloader</Nav.Link>
+                        <Nav.Link href="/#/converter" className={styles.nav_item}>Converter</Nav.Link>
                         <Nav.Link href="https://github.com/joshbernsteint/YouTube_Downloader" target="_blank" className={styles.nav_item}>GitHub Source</Nav.Link>
-                        <Nav.Link href="/settings" className={styles.nav_item}>
-                            <img src="/settings.png"
+                        <Nav.Link href="/#/settings" className={styles.nav_item}>
+                            <img src="./settings.png"
                             width="30"
                             height="30"/>
                             </Nav.Link>
