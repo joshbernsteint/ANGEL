@@ -72,7 +72,6 @@ function Video_downloader(){
             console.log(qualityOptions)
             handleShow()
             
-            // window.open(`http://localhost:5000/video/${responseData.data.id}/high`)
         }
     }
 

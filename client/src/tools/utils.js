@@ -1,5 +1,5 @@
 
-//Converts a time from seconds into H:M:S
+//Converts a time from seconds into HH:MM:SS
 export function convertTime(length_seconds){
 
     function padZero(time){

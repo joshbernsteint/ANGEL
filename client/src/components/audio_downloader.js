@@ -1,7 +1,6 @@
 import "../App.css"
 import { Button, Form, Stack, Modal, Accordion, OverlayTrigger, Popover, CloseButton, DropdownButton,
 Dropdown } from "react-bootstrap";
-import { Navigate } from 'react-router-dom'
 import { useRef, useState } from "react";
 import { convertTime  } from "../tools/utils";
 import axios from 'axios'
@@ -46,7 +45,6 @@ function Audio_downloader(){
                 setAudioData(video_data);
                 handleShow()
             }
-        // window.open(`http://localhost:5000/audio/${video_data.id}/high`)
 
     }
 
