@@ -50,6 +50,7 @@ function Audio_downloader(){
 
     }
 
+
     function handleSubmit(e){
         e.preventDefault();
         if(nameRef.current.value === ""){
@@ -60,6 +61,15 @@ function Audio_downloader(){
             setNameError(true);
             downloadAudio();
             handleClose();
+        }
+    }
+
+    function handleListener(e){
+        if(e.key === 'Enter'){
+            handleSubmit(e);
+        }
+        else{
+            console.log(e.key);
         }
     }
 
@@ -84,11 +94,6 @@ function Audio_downloader(){
                 onHide={handleClose}
                 backdrop="static"
                 keyboard={true}
-                onEnter={() => document.addEventListener('keydown',(e) => {
-                    if(e.key === 'Enter'){
-                        handleSubmit(e);
-                    }
-                })}
             >
                 <Modal.Header closeButton>
                     <Modal.Title>Link Parsed Successfully</Modal.Title>
@@ -147,7 +152,7 @@ function Audio_downloader(){
                 <Button variant="danger" onClick={handleClose}>
                     Cancel
                 </Button>
-                <Button variant="primary" type="Submit" onClick={(e) => handleSubmit(e)}>Download</Button>
+                <Button variant="primary" type="Submit" onClick={(e) => handleSubmit(e)} id="download">Download</Button>
                 </Modal.Footer>
             </Modal>
         </div>
