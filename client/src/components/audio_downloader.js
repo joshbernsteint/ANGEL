@@ -9,6 +9,8 @@ import axios from 'axios'
 
 function Audio_downloader(){
 
+    const audioTypes = ['mp3','wav','ogg']
+    const audioQuals = ['High', 'Low']
 
     const urlRef = useRef(null)
     const nameRef = useRef(null)
@@ -48,6 +50,19 @@ function Audio_downloader(){
 
     }
 
+    function handleSubmit(e){
+        e.preventDefault();
+        if(nameRef.current.value === ""){
+            setNameError(false)
+            console.log("Error: File must have valid name")
+        }
+        else{
+            setNameError(true);
+            downloadAudio();
+            handleClose();
+        }
+    }
+
     return (
         <div className="home">
             <h2>YTOOO</h2>
@@ -68,7 +83,12 @@ function Audio_downloader(){
                 show={show}
                 onHide={handleClose}
                 backdrop="static"
-                keyboard={false}
+                keyboard={true}
+                onEnter={() => document.addEventListener('keydown',(e) => {
+                    if(e.key === 'Enter'){
+                        handleSubmit(e);
+                    }
+                })}
             >
                 <Modal.Header closeButton>
                     <Modal.Title>Link Parsed Successfully</Modal.Title>
@@ -98,15 +118,13 @@ function Audio_downloader(){
                                 </Popover.Body>
                               </Popover>
                             )}>
-                                <Form.Control type="text" placeholder="Enter name for file" ref={nameRef} style={{width: "50%",display: "inline"}} required/>
+                                <Form.Control type="text" placeholder="Enter name for file" ref={nameRef} style={{width: "50%",display: "inline"}} required autoFocus/>
                             </OverlayTrigger>
                             <DropdownButton id="dropdown-basic-button" title={`.${audioType}`} style={{width: "10%",display: "inline"}}  variant="success">
-                                <Dropdown.ItemText><b>Native Formats</b></Dropdown.ItemText>
-                                <Dropdown.Item onClick={() => {setAudioType('mp3'); }}>.mp3</Dropdown.Item>
-                                <Dropdown.Item onClick={() => {setAudioType('wav'); }}>.wav</Dropdown.Item>
-                                <Dropdown.Divider/>
-                                <Dropdown.ItemText><b>Other Formats</b></Dropdown.ItemText>
-                                <Dropdown.Item onClick={() => {setAudioType('ogg');}}>.ogg</Dropdown.Item>
+                                <Dropdown.ItemText><b>Formats</b></Dropdown.ItemText>
+                                {audioTypes.map((el,i) => (
+                                    <Dropdown.Item key={i} onClick={() => {setAudioType(el); }}>{el}</Dropdown.Item>
+                                ))}
                             </DropdownButton>
                             {' '}
                         </Form.Group>
@@ -117,9 +135,10 @@ function Audio_downloader(){
                     <Stack gap={2}>
                         <Stack direction="horizontal" gap={3}>
                             <h5 style={{display: "inline"}}>Audio: </h5>
-                            <DropdownButton id="dropdown-basic-button" title={audioQuality} variant="info" style={{display: "inline"}}>    
-                                <Dropdown.Item onClick={() => {setAudioQuality('High');}}>High</Dropdown.Item>
-                                <Dropdown.Item onClick={() => {setAudioQuality('Low')}}>Low</Dropdown.Item>
+                            <DropdownButton id="dropdown-basic-button" title={audioQuality} variant="info" style={{display: "inline"}}>
+                                {audioQuals.map((el,i) => (
+                                    <Dropdown.Item key={i} onClick={() => {setAudioQuality(el); }}>{el}</Dropdown.Item>
+                                ))}
                             </DropdownButton>
                         </Stack>
                     </Stack>
@@ -128,19 +147,7 @@ function Audio_downloader(){
                 <Button variant="danger" onClick={handleClose}>
                     Cancel
                 </Button>
-                <Button variant="primary" type="Submit" onClick={(e) => {
-                    e.preventDefault();
-                    if(nameRef.current.value === ""){
-                        setNameError(false)
-                        console.log("Error: File must have valid name")
-                    }
-                    else{
-                        setNameError(true);
-                        downloadAudio();
-                        handleClose();
-                    }
-                
-                }}>Download</Button>
+                <Button variant="primary" type="Submit" onClick={(e) => handleSubmit(e)}>Download</Button>
                 </Modal.Footer>
             </Modal>
         </div>
