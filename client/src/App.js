@@ -4,10 +4,6 @@ import {
   Routes,
   Route,
 } from "react-router-dom";
-import {
-  createHashRouter,
-  RouterProvider
-} from 'react-router-dom';
 import "bootstrap/dist/css/bootstrap.min.css";
 import Nav_bar from './components/navbar';
 import "./App.css"
@@ -18,32 +14,26 @@ import Converter from './components/converter';
 import Settings from './components/settings';
 
 
-const router = createHashRouter([
-  {
-    path: "/*",
-    element: <Home />,
-  },
-  {
-    path: "/audio_downloader",
-    element: <Audio_downloader/>,
-  },
-]);
+const Home_Screen = () => {return (<Home/>)};
+const Audio_Screen = () => {return (<Audio_downloader/>)};
+const Video_Screen = () => {return (<Video_downloader/>)};
+const Converter_Screen = () => {return (<Converter/>)};
+const Settings_Screen = () => {return (<Settings/>)};
 
 function App() {
   return (
-    <div className='main'>
+      <Router>
+      <div className='main'>
       <Nav_bar/>
-      {/* <RouterProvider router={router}/> */}
-      <Router basename={process.env.PUBLIC_URL + "/"}>
         <Routes>
-          <Route path="/" exact Component={ Home }/>
-          <Route path="/audio_downloader" Component={ Audio_downloader }/>
-          <Route path="/video_downloader" Component={ Video_downloader }/>
-          <Route path="/converter" Component={ Converter }/>
-          <Route path="/settings" Component={ Settings}/>
+          <Route path="/" exact Component={ Home_Screen }/>
+          <Route exact path="/audio_downloader" Component={ Audio_Screen }/>
+          <Route exact path="/video_downloader" Component={ Video_Screen }/>
+          <Route exact path="/converter" Component={ Converter_Screen }/>
+          <Route exact path="/settings" Component={ Settings_Screen}/>
         </Routes>
-      </Router>
-    </div>
+      </div>
+    </Router>
   );
 }
 

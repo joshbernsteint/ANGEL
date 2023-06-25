@@ -10,8 +10,11 @@
 
 .nav_item {
     color:black;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
     font-size: large;
     transition: translate ease-in-out 100ms;
+    text-decoration: none;
     font-weight: 500;
 }
 

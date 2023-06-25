@@ -10,8 +10,6 @@ function Home(){
 
     return (
         <div className="home">
-            <h2>YTOOO</h2>
-            <h3>-----</h3>
             <h1>Home</h1>
         </div>
     );
