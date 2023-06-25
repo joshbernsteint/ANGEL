@@ -108,7 +108,7 @@ function Video_downloader(){
                         <Accordion>
                             <Accordion.Item eventKey="0">
                                 <Accordion.Header><h6>Description</h6></Accordion.Header>
-                                <Accordion.Body style={{margin: "2%", overflowX: "auto"}}>{videoData.desc}</Accordion.Body>
+                                <Accordion.Body style={{margin: "2%", overflowX: "auto",whiteSpace: "pre-wrap"}}>{videoData.desc}</Accordion.Body>
                             </Accordion.Item>
                         </Accordion>
                     )}
@@ -125,7 +125,7 @@ function Video_downloader(){
                                 </Popover.Body>
                               </Popover>
                             )}>
-                                <Form.Control type="text" placeholder="Enter name for file" ref={nameRef} style={{width: "50%",display: "inline"}} required/>
+                                <Form.Control type="text" placeholder="Enter name for file" ref={nameRef} style={{width: "50%",display: "inline"}} required autoFocus/>
                             </OverlayTrigger>
                             <DropdownButton id="dropdown-basic-button" title={`.${videoType}`} style={{width: "10%",display: "inline"}}  variant="success">
                                 <Dropdown.ItemText><b>Native Formats</b></Dropdown.ItemText>
