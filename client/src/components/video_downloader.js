@@ -1,8 +1,8 @@
 import "../App.css"
 import { Button, Form, Stack, Modal, Accordion, Dropdown, DropdownButton, OverlayTrigger, Popover, CloseButton } from "react-bootstrap";
-import fileDownload from 'react-file-download'
 import { Navigate } from 'react-router-dom'
 import { useRef, useState, useEffect } from "react";
+import { convertTime } from "../tools/utils";
 import axios from 'axios'
 
 
@@ -15,7 +15,6 @@ function Video_downloader(){
 
     const [videoData, setVideoData] = useState({});
     const [show, setShow] = useState(false)
-    const [videoTime, setVideoTime] = useState('');
     const [videoType, setVideoType] = useState('mp4');
     const [qualityOptions, setQualityOptions] = useState({});
     const [videoQuality, setVideoQuality] = useState('')
@@ -53,15 +52,6 @@ function Video_downloader(){
         }
         else{
             console.log(video_data)
-
-            //Converting video length into a more readable format
-            let seconds = video_data.length_seconds
-            const hours = Math.floor(seconds / 3600)
-            seconds %= 3600;
-            const minutes = Math.floor(seconds / 60);
-            seconds %= 60;
-            setVideoTime(`${hours}:${minutes}:${seconds}`)
-
             //Getting diffferent quality options
             let w_options = [];
             let m_options = [];
@@ -113,7 +103,7 @@ function Video_downloader(){
                 </Modal.Header>
                 <Modal.Body>
                     <h5 style={{display: "inline"}}>Title: </h5><p style={{display: "inline"}}>{videoData.title}</p><br/>
-                    <h5 style={{display: "inline"}}>Length: </h5><p style={{display: "inline"}}>{videoTime}</p><br/>
+                    <h5 style={{display: "inline"}}>Length: </h5><p style={{display: "inline"}}>{convertTime(videoData.length_seconds)}</p><br/>
                     <h5 style={{display: "inline"}}>Video ID: </h5><p style={{display: "inline"}}>{videoData.id}</p><br/>
                     {(!videoData.desc) ? (<h5 style={{color: "red"}}>Description: None</h5>) : (
                         <Accordion>

@@ -1,22 +1,29 @@
 import "../App.css"
-import { Button, Form, Stack, Row } from "react-bootstrap";
-import fileDownload from 'react-file-download'
+import { Button, Form, Stack, Modal, Accordion } from "react-bootstrap";
 import { Navigate } from 'react-router-dom'
 import { useRef, useState } from "react";
+import { convertTime  } from "../tools/utils";
 import axios from 'axios'
 
 
 
 
 function Audio_downloader(){
+
+
     const urlRef = useRef(null)
-    const [id, setID] = useState(null)
+    const [show, setShow] = useState(false)
+    const [nameError, setNameError] = useState(false);
+    const [audioData, setAudioData] = useState({});
+    const handleClose = () => {setNameError(true);setShow(false);}
+    const handleShow = () => {setNameError(true);setShow(true);};
+
 
     async function getID(e){
             e.preventDefault();
             let id_response = () => {
                 return new Promise(function(resolve, reject){
-                    axios.get(`http://localhost:5000/get_id`,{ params: {url: urlRef.current.value}}).then(
+                    axios.get(`http://192.168.1.226:5000/get_data`,{ params: {url: urlRef.current.value}}).then(
                         response => resolve(response)
                     );
                 });
@@ -28,11 +35,10 @@ function Audio_downloader(){
                 //TODO: Handle error
             }
             else{
-                setID(video_data.id)
-                console.log(video_data)
+                setAudioData(video_data);
+                handleShow()
             }
-            urlRef.current.value=""
-        window.open(`http://localhost:5000/audio/${video_data.id}/high`)
+        // window.open(`http://localhost:5000/audio/${video_data.id}/high`)
 
     }
 
@@ -52,6 +58,21 @@ function Audio_downloader(){
                     </Stack>
                 </Form.Group>
             </Form>
+            <Modal
+                show={show}
+                onHide={handleClose}
+                backdrop="static"
+                keyboard={false}
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Link Parsed Successfully</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <h5 style={{display: "inline"}}>Title: </h5><p style={{display: "inline"}}>{audioData.title}</p><br/>
+                    <h5 style={{display: "inline"}}>Length: </h5><p style={{display: "inline"}}>{convertTime(audioData.length_seconds)}</p><br/>
+                    <h5 style={{display: "inline"}}>Video ID: </h5><p style={{display: "inline"}}>{audioData.id}</p><br/>
+                </Modal.Body>
+            </Modal>
         </div>
     );
 }
