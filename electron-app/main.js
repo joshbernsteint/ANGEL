@@ -1,6 +1,6 @@
 const {app, BrowserWindow } = require('electron');
 const path = require('path')
-require('D:/Coding/YouTube_Downloader/server/server.js');
+require('./server/server.js');//TODO: CHANGE THIS
 
 const createWindow = () => {
     const win = new BrowserWindow({
