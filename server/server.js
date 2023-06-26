@@ -24,7 +24,6 @@ app.get('/get_id', async(req,res) => {
         res.status(200).json({id: video_id})
     }
     catch(err){
-        console.log(err.message)
         res.json({error: err.message})
     }
 })
@@ -33,10 +32,8 @@ app.get('/get_id', async(req,res) => {
 app.get('/get_data', async (req,res) => {
     const url_query = req.query.url
     const video_options = new Set();
-    console.log("--------------------\nVideo URL: "+url_query)
     try{
         const video_id = ytdl.getURLVideoID(url_query);
-        console.log("Video ID: "+video_id+"\n--------------------")
         const video_info = await ytdl.getInfo(url_query);
         video_info.formats.forEach(element => {
             if(element.qualityLabel){
@@ -46,7 +43,6 @@ app.get('/get_data', async (req,res) => {
         res.status(200).json({title: video_info.videoDetails.title,url: req.query.url, id: video_id,length_seconds: video_info.videoDetails.lengthSeconds,desc: video_info.videoDetails.description, video_options: [...video_options]})
     }
     catch(err){
-        console.log(err.message)
         res.json({error: err.message})
     }
 })
@@ -82,13 +78,13 @@ app.get('/video/:id/:itag/:name/:format/:audio', async (req,res) => {
     audio.pipe(ffmpegProcess.stdio[4]);
     video.pipe(ffmpegProcess.stdio[5]);
     ffmpegProcess.on('close', async () => {
-        console.log(`Done downloading video ID ${req.params.id}`)
+        // console.log(`Done downloading video ID ${req.params.id}`)
         res.download(path.resolve(`./${req.params.name}.${req.params.format}`), (err) => {
             if(err){
-                console.log(err)
+                // console.log(err)
             }
             else{
-                console.log(`Deleting File ${req.params.id}`)
+                // console.log(`Deleting File ${req.params.id}`)
                 fs.unlinkSync(path.resolve( `./${req.params.name}.${req.params.format}`));
 
             }
@@ -124,17 +120,17 @@ app.get('/audio/:id/:qual/:name/:format', async (req,res) => {
       });
     audio.pipe(ffmpegProcess.stdio[4]);
     ffmpegProcess.on('start',() => {
-        console.log(`Started downloading audio ID ${req.params.id}`)
+        // console.log(`Started downloading audio ID ${req.params.id}`)
     })
     ffmpegProcess.on('close', async () => {
-        console.log(`Done downloading audio ID ${req.params.id}`)
+        // console.log(`Done downloading audio ID ${req.params.id}`)
         res.download(path.resolve(`./${fileName}`), (err) => {
             if(err){
-                console.log(err)
+                // console.log(err)
             }
             else{
-                console.log(`Deleting File ${fileName}`)
-                fs.unlinkSync(path.resolve(`./${fileName}`));
+                // console.log(`Deleting File ${fileName}`)
+                // fs.unlinkSync(path.resolve(`./${fileName}`));
 
             }
         })
@@ -143,5 +139,5 @@ app.get('/audio/:id/:qual/:name/:format', async (req,res) => {
 
 //Listening at the port
 app.listen(port, () => {
-    console.log('Server started on port',port);
+    // console.log('Server started on port',port);
 })
