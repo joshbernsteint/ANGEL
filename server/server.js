@@ -130,7 +130,7 @@ app.get('/audio/:id/:qual/:name/:format', async (req,res) => {
             }
             else{
                 // console.log(`Deleting File ${fileName}`)
-                // fs.unlinkSync(path.resolve(`./${fileName}`));
+                fs.unlinkSync(path.resolve(`./${fileName}`));
 
             }
         })
