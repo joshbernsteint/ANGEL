@@ -31,7 +31,8 @@ function Video_downloader(){
 
 
     async function downloadVideo(){
-        window.open(`http://localhost:5000/video/${videoData.id}/${itag}/${nameRef.current.value}/${videoType}/${audioQuality}`,"_blank")
+        // window.open(`http://localhost:5000/video/${videoData.id}/${itag}/${nameRef.current.value}/${videoType}/${audioQuality}`,"_blank")
+        window.location.assign(`http://localhost:5000/video/${videoData.id}/${itag}/${nameRef.current.value}/${videoType}/${audioQuality}`)
     }
 
     async function getVideoData(e){
