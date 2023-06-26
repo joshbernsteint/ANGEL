@@ -139,5 +139,5 @@ app.get('/audio/:id/:qual/:name/:format', async (req,res) => {
 
 //Listening at the port
 app.listen(port, () => {
-    // console.log('Server started on port',port);
+    console.log('Server started on port',port);
 })
