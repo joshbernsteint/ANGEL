@@ -1,13 +1,13 @@
 const {app, BrowserWindow } = require('electron');
 const path = require('path')
-require('./server/server.js');//TODO: CHANGE THIS
+require('D:/Coding/YouTube_Downloader/server/server.js');//TODO: CHANGE ME
 
 const createWindow = () => {
     const win = new BrowserWindow({
         width: 1400,
         height: 1000,
     })
-    win.webContents.openDevTools();
+    // win.webContents.openDevTools();
     win.loadFile(`index.html`)
 }
 
