@@ -49,7 +49,7 @@ int fillArray(const char* str,char* target,size_t len){
     }
 }
 
-int _tmain( int argc, TCHAR *argv[] )
+int _tmain()
 {
     STARTUPINFO server_si;
     PROCESS_INFORMATION server_pi;
