@@ -37,8 +37,11 @@ module.exports = {
       var server_path = path.join(__dirname,'../server/')
       var dst = buildPath;
       fs.cpSync(src, dst, {recursive: true});
-      fs.mkdirSync(path.join(dst,'/yt_server/'));
-      fs.cpSync(server_path,path.join(dst,'/yt_server/'), {recursive: true});
     },
+    postMake: async (config, makeP) => {
+      // fs.mkdirSync(path.join(__dirname,'/yt_server/'));
+      fs.cpSync(path.join(__dirname,'../server/'),path.join(__dirname,'/out/electron-app-win32-x64/yt_server/'), {recursive: true});
+      fs.cpSync(path.join(__dirname,'../server/setup.exe'),path.join(__dirname,'/out/electron-app-win32-x64/setup.exe'), {recursive: true});
+    }
   }
 };
