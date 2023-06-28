@@ -1,16 +1,15 @@
-import {Nav, Navbar, NavDropdown, Container } from 'react-bootstrap'
+import {Nav,Container } from 'react-bootstrap'
 import {Link } from 'react-router-dom'
-// import '../App.css'
 import styles from "./navbar.module.css"
 
-function Nav_bar(){
+function Navbar(){
 
     return (
         <Navbar className={styles.nav} fixed="top" expand='lg'>
             <Container fluid>
                 <Navbar.Brand to="/" className={styles.nav_brand}>
                     <img
-                    alt=""
+                    alt="brand icon"
                     src="./icon.ico"
                     width="35"
                     height="35"
@@ -29,6 +28,7 @@ function Nav_bar(){
                         <Link to="/settings" className={styles.nav_item}>
                             <img src="./settings.png"
                             width="30"
+                            alt="settings icon"
                             height="30"/>
                             </Link>
                     </Nav>
@@ -39,4 +39,4 @@ function Nav_bar(){
     );
 }
 
-export default Nav_bar;
+export default Navbar;

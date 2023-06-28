@@ -9,12 +9,16 @@ const cors = require('cors')
 
 
 const app = express();
-const port = 5000;
+var port = 6547;//Default value for port is 6547
 
 app.get('/', (req,res) => {
     res.send('Nothing to see here folks')
 });
 app.use(cors())//Fixes error
+
+app.get('/test_connection', (req,res) => {
+    res.send('Connection successful!');
+});
 
 //For getting video ID
 app.get('/get_id', async(req,res) => {
@@ -137,7 +141,19 @@ app.get('/audio/:id/:qual/:name/:format', async (req,res) => {
     })
 });
 
-//Listening at the port
-app.listen(port, () => {
-    console.log('Server started on port',port);
-})
+
+var foundPort = false;
+//Find an open port on the machine, starting at the default value
+while(!foundPort){
+    try {
+        app.listen(port, () => {
+            console.log('Server started on port',port);
+        })
+        foundPort = true;
+        break;
+    } catch (error) {
+        console.log(`Port ${port} did not work, trying another one...`);
+        port++;
+    }
+}
+

@@ -1,7 +1,7 @@
 import '../App.css'
 
 
-function Converter(){
+function Converter(props){
     return (
         <div className="home">
             <h1>Converting</h1>

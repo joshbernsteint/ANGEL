@@ -1,7 +1,6 @@
 import "../App.css"
 import { Button, Form, Stack, Modal, Accordion, Dropdown, DropdownButton, OverlayTrigger, Popover, CloseButton } from "react-bootstrap";
-import { Navigate } from 'react-router-dom'
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
 import { convertTime } from "../tools/utils";
 import axios from 'axios'
 
@@ -9,7 +8,7 @@ import axios from 'axios'
 
 
 
-function Video_downloader(){
+function VideoDownloader(props){
     const urlRef = useRef(null);
     const nameRef = useRef(null);
 
@@ -31,15 +30,14 @@ function Video_downloader(){
 
 
     async function downloadVideo(){
-        // window.open(`http://localhost:5000/video/${videoData.id}/${itag}/${nameRef.current.value}/${videoType}/${audioQuality}`,"_blank")
-        window.location.assign(`http://localhost:5000/video/${videoData.id}/${itag}/${nameRef.current.value}/${videoType}/${audioQuality}`)
+        window.location.assign(`http://localhost:${props.port}/video/${videoData.id}/${itag}/${nameRef.current.value}/${videoType}/${audioQuality}`)
     }
 
     async function getVideoData(e){
         e.preventDefault()
         let data_response = () => {
             return new Promise(function(resolve, reject){
-                axios.get(`http://localhost:5000/get_data`,{ params: {url: urlRef.current.value}}).then(
+                axios.get(`http://localhost:${props.port}/get_data`,{ params: {url: urlRef.current.value}}).then(
                     response => resolve(response)
                 );
             });
@@ -52,7 +50,6 @@ function Video_downloader(){
             //TODO: Handle error
         }
         else{
-            console.log(video_data)
             //Getting diffferent quality options
             let w_options = [];
             let m_options = [];
@@ -70,8 +67,7 @@ function Video_downloader(){
             setVideoQuality(m_options[0].quality);
             setItag(m_options[0].itag);
             setQualityOptions({mp4: m_options, webm: w_options});
-            console.log(qualityOptions)
-            handleShow()
+            handleShow();
             
         }
     }
@@ -186,4 +182,4 @@ function Video_downloader(){
     );
 }
 
-export default Video_downloader;
+export default VideoDownloader;

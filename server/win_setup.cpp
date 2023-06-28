@@ -83,7 +83,7 @@ int _tmain()
     
     
 
-    // Wait until child process exits.
+    // Wait until app process exits.
     while(windowOpened){
         WaitForSingleObject( app_pi.hProcess, INFINITE ); //Wait for the app to be closed by the user
         windowReturn = FindWindow(NULL,window_name);//Making sure the window was actually closed
@@ -96,7 +96,7 @@ int _tmain()
         }
     }
     printf("Server Terminating\n"); 
-    TerminateProcess(server_pi.hProcess, 0);//Terminates the server downloading the videos
+    TerminateProcess(server_pi.hProcess, 0);//Terminates the server that downloads the videos
     
 
     // Close process and thread handles. 

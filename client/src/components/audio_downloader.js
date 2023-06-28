@@ -1,13 +1,13 @@
 import "../App.css"
 import { Button, Form, Stack, Modal, Accordion, OverlayTrigger, Popover, CloseButton, DropdownButton,
 Dropdown } from "react-bootstrap";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
 import { convertTime  } from "../tools/utils";
 import axios from 'axios'
 
 
 
-function Audio_downloader(){
+function AudioDownloader(props){
 
     const audioTypes = ['mp3','wav','ogg']
     const audioQuals = ['High', 'Low']
@@ -39,14 +39,15 @@ function Audio_downloader(){
 
 
     async function downloadAudio(){
-        window.open(`http://localhost:5000/audio/${audioData.id}/${audioQuality}/${nameRef.current.value}/${audioType}`)
+        window.location.assign(`http://localhost:${props.port}/audio/${audioData.id}/${audioQuality}/${nameRef.current.value}/${audioType}`);
+
     }
 
     async function getData(e){
             e.preventDefault();
             let id_response = () => {
                 return new Promise(function(resolve, reject){
-                    axios.get(`http://localhost:5000/get_data`,{ params: {url: urlRef.current.value}}).then(
+                    axios.get(`http://localhost:${props.port}/get_data`,{ params: {url: urlRef.current.value}}).then(
                         response => resolve(response)
                     );
                 });
@@ -153,4 +154,4 @@ function Audio_downloader(){
     );
 }
 
-export default Audio_downloader;
+export default AudioDownloader;

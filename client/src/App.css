@@ -23,3 +23,28 @@
     height: 40px;
     width: 10rem;
 }
+.spinner_container{
+    margin: 0 auto;
+    justify-content: center;
+    align-items: center;
+    height: 20rem;
+    text-align: center;
+}
+
+
+.spinner_footer{
+    margin: 0 auto;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.loading_spinner{
+    position: fixed;
+    top: 20%;
+    left: 46%;
+    right: 0;
+    bottom: 0;
+    height: 10rem;
+    width: 10rem;
+}
