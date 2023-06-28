@@ -6,52 +6,25 @@ import {
 } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css"
-import Navbar from './components/navbar';
+import MyNavbar from './components/navbar';
 import Home from './components/home';
 import AudioDownloader from './components/audio_downloader';
 import VideoDownloader from './components/video_downloader';
 import Converter from './components/converter';
 import Settings from './components/settings';
 import { useState, useEffect } from 'react';
-import {Spinner, Modal} from 'react-bootstrap'
+import {Spinner, Modal} from 'react-bootstrap';
+import portData from './server_port.ytp';
 
 
-function LoadingServer(){
-  return (
-    <Modal
-        show={true}
-        animation={false}
-          backdrop="static"
-          keyboard={false}
-        >
-        <Modal.Header>
-          <Modal.Title>Hold up a second!</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className='spinner_container'>
-          <Spinner animation="grow" variant="primary" className='loading_spinner'style={{zIndex: "1"}}/>
-          <Spinner animation="border" variant="primary" className='loading_spinner' style={{zIndex: "2"}}/>
-          <br/>
-          <br/>
-          <br/>
-          <br/>
-          <br/>
-          <br/>
-          <br/>
-          <br/>
-          <h3>We're trying to connect to the internal server, it'll just be a moment!</h3>
-        </Modal.Body>
-        <Modal.Footer className='spinner_footer'>
-          <h5>Thank you for your patience</h5>
-        </Modal.Footer>
-      </Modal>
-  );
-}
+
 
 
 function App() {
 
 
   const [port, setPort] = useState(6547);
+  const [show, setShow] = useState(true);
   const [hasPort, setHasPort]= useState(false);
 
   const Home_Screen = () => {return (<Home/>)};
@@ -60,11 +33,43 @@ function App() {
   const Converter_Screen = () => {return (<Converter port={port}/>)};
   const Settings_Screen = () => {return (<Settings/>)};
 
-  
-  //Finds the server port for downloading images
+
+  function LoadingServer(){
+    return (
+      <Modal
+          show={show}
+          animation={false}
+            backdrop="static"
+            keyboard={false}
+          >
+          <Modal.Header>
+            <Modal.Title>Hold up a second!</Modal.Title>
+          </Modal.Header>
+          <Modal.Body className='spinner_container'>
+            <Spinner animation="grow" variant="primary" className='loading_spinner'style={{zIndex: "1"}}/>
+            <Spinner animation="border" variant="primary" className='loading_spinner' style={{zIndex: "2"}}/>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+            <h3>We're trying to connect to the internal server, it'll just be a moment!</h3>
+          </Modal.Body>
+          <Modal.Footer className='spinner_footer'>
+            <h5>Thank you for your patience</h5>
+          </Modal.Footer>
+        </Modal>
+    );
+  }
+
+
+  // Finds the server port for downloading images
   useEffect(()=>{
     async function findPort(){
-      var curPort = port;
+      var curPort = 6547;
       var foundPort = false;
       
       //TODO make this not suck
@@ -75,25 +80,29 @@ function App() {
           console.log(`Port ${curPort} made a successful connection`);
           setPort(curPort);
           setHasPort(!hasPort);
+          setShow(false);
         }}
         ).catch(
           rejected => {
             console.log(`Port ${curPort} was not correct, trying next port now...`);
             curPort++;});
       }
+
+      await fetch(portData).then(res => res.text())
+      .then(text => console.log(text));
     }
 
     findPort();
   },[]);
 
-  // useEffect(() => {
-  //   console.log(port);
-  // },[port]);
+  useEffect(() => {
+    console.log(port);
+  },[port]);
 
   return (
       <Router>
       <div className='main'>
-      <Navbar/>
+      <MyNavbar/>
         <Routes>
           <Route path="/" exact Component={ Home_Screen }/>
           <Route exact path="/audio_downloader" Component={ Audio_Screen }/>
@@ -101,7 +110,7 @@ function App() {
           <Route exact path="/converter" Component={ Converter_Screen }/>
           <Route exact path="/settings" Component={ Settings_Screen}/>
         </Routes>
-      {hasPort ? <h1>Have it!</h1>: <LoadingServer/>}
+      <LoadingServer/>
       </div>
     </Router>
   );

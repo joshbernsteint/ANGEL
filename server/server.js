@@ -9,7 +9,7 @@ const cors = require('cors')
 
 
 const app = express();
-var port = 6547;//Default value for port is 6547
+var port = 6549;//Default value for port is 6547
 
 app.get('/', (req,res) => {
     res.send('Nothing to see here folks')

@@ -1,8 +1,8 @@
-import {Nav,Container } from 'react-bootstrap'
-import {Link } from 'react-router-dom'
+import {Nav,Container, Navbar } from 'react-bootstrap'
+import { Link } from 'react-router-dom'
 import styles from "./navbar.module.css"
 
-function Navbar(){
+function MyNavbar(){
 
     return (
         <Navbar className={styles.nav} fixed="top" expand='lg'>
@@ -39,4 +39,4 @@ function Navbar(){
     );
 }
 
-export default Navbar;
+export default MyNavbar;

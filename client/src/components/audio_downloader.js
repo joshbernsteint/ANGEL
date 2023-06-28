@@ -14,7 +14,7 @@ function AudioDownloader(props){
 
     const urlRef = useRef(null)
     const nameRef = useRef(null)
-    const [show, setShow] = useState(false)
+    const [show, setShow] = useState(false);
     const [nameError, setNameError] = useState(false);
     const [audioQuality, setAudioQuality] = useState('High');
     const [audioData, setAudioData] = useState({});
