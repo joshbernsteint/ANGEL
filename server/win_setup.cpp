@@ -77,8 +77,8 @@ int _tmain()
     FreeConsole();
     // Start the processes. 
     printf("Starting Processes\n");
-    makeProcess(app_call,NULL,app_si,app_pi);
     makeProcess(server_call,server_args,server_si,server_pi);
+    makeProcess(app_call,NULL,app_si,app_pi);
     printf("Processes Created\n");
     
     
