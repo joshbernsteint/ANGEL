@@ -14,7 +14,6 @@ import Converter from './components/converter';
 import Settings from './components/settings';
 import { useState, useEffect } from 'react';
 import {Spinner, Modal} from 'react-bootstrap';
-import portData from './server_port.ytp';
 
 
 
@@ -87,17 +86,12 @@ function App() {
             console.log(`Port ${curPort} was not correct, trying next port now...`);
             curPort++;});
       }
-
-      await fetch(portData).then(res => res.text())
-      .then(text => console.log(text));
     }
 
     findPort();
   },[]);
 
-  useEffect(() => {
-    console.log(port);
-  },[port]);
+
 
   return (
       <Router>

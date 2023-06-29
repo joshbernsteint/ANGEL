@@ -1,14 +1,17 @@
-const express = require('express');
 const path = require('path');
-const ytdl = require('ytdl-core');
-const ffmpeg = require('ffmpeg-static');
 const fs = require('fs');
 const cp = require('child_process');
+
+const express = require('express');
+const ytdl = require('ytdl-core');
+const ffmpeg = require('ffmpeg-static');
 const cors = require('cors')
 
 
 
 const app = express();
+
+var downloadPath = "";
 var port = 6547;//Default value for port is 6547
 
 app.get('/', (req,res) => {
@@ -18,6 +21,12 @@ app.use(cors())//Fixes error
 
 app.get('/test_connection', (req,res) => {
     res.send('Connection successful!');
+});
+
+app.get('/set_download_path', (req, res) => {
+    downloadPath = req.query.path;
+    console.log(`Setting file download path to ${downloadPath}`);
+    res.status(200);
 });
 
 //For getting video ID
@@ -142,18 +151,30 @@ app.get('/audio/:id/:qual/:name/:format', async (req,res) => {
 });
 
 
-var foundPort = false;
-//Find an open port on the machine, starting at the default value
-while(!foundPort){
-    try {
-        app.listen(port, () => {
-            console.log('Server started on port',port);
-        })
-        foundPort = true;
-        break;
-    } catch (error) {
-        console.log(`Port ${port} did not work, trying another one...`);
-        port++;
+
+//Finds an available port #
+async function findPort(){
+    var foundPort = false;
+    //Find an open port on the machine, starting at the default value
+    while(!foundPort){
+        try {
+            await app.listen(port, () => {
+                console.log('Server started on port',port);
+            })
+            foundPort = true;
+        } catch (error) {
+            console.log(error);
+            console.log(`Port ${port} did not work, trying another one...`);
+            port++;
+            break
+        }
     }
 }
+
+findPort();
+
+
+
+
+
 

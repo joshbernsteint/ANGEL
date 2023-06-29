@@ -6,7 +6,7 @@ import axios from 'axios'
 
 
 
-function Home(){
+function Home(props){
 
     return (
         <div className="home">
