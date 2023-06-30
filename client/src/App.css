@@ -48,3 +48,44 @@
     height: 10rem;
     width: 10rem;
 }
+.settings_window{
+    width: 100%;
+}
+
+.settings_tab_menu{
+    /* background-color: transparent; */
+    width: 20%;
+    padding: 2rem;
+}
+
+.tab_button{
+    background-color: none;
+    border: none;
+}
+
+.tab_link{
+    border: none;
+    color: black;
+}
+
+.tab_link:hover{
+    color:rgb(0, 127, 231)
+}
+
+.settings_options{
+    justify-content: left;
+    align-content: left;
+    border-radius: 5px;
+    width: 80%;
+    padding: 1rem;
+    margin: 0 1rem;
+    border: .1rem solid black;
+}
+
+.center{
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    left: 50%;
+}
