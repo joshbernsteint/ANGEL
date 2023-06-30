@@ -39,8 +39,14 @@ function AudioDownloader(props){
 
 
     async function downloadAudio(){
-        window.location.assign(`http://localhost:${props.port}/audio/${audioData.id}/${audioQuality}/${nameRef.current.value}/${audioType}`);
-
+        fetch(`http://localhost:${props.port}/audio/${audioData.id}/${audioQuality}/${nameRef.current.value}/${audioType}`).then(res => {
+            if(res.status==200){
+                console.log('Audio downloaded!');
+            }
+            else{
+                console.log('ERROR IN AUDIO DOWNLOAD');
+            }
+        })
     }
 
     async function getData(e){
@@ -89,6 +95,7 @@ function AudioDownloader(props){
                 onHide={handleClose}
                 backdrop="static"
                 keyboard={true}
+                onSubmit={e => e.preventDefault()}
             >
                 <Modal.Header closeButton>
                     <Modal.Title>Link Parsed Successfully</Modal.Title>
@@ -108,7 +115,7 @@ function AudioDownloader(props){
                     <br/>
                     <hr/>
                     <h4>File Name</h4>
-                    <Form>
+                    <Form onSubmit={(e) => {e.preventDefault();console.log('default prevented!');}}>
                         <Form.Group>
                             <OverlayTrigger show={!nameError} defaultShow={false} placement="bottom" delay={{show:250, hide: 400}} overlay={(
                                 <Popover id="popover-basic">
@@ -120,7 +127,7 @@ function AudioDownloader(props){
                             )}>
                                 <Form.Control type="text" placeholder="Enter name for file" ref={nameRef} style={{width: "50%",display: "inline"}} required autoFocus/>
                             </OverlayTrigger>
-                            <DropdownButton id="dropdown-basic-button" title={`.${audioType}`} style={{width: "10%",display: "inline"}}  variant="success">
+                            <DropdownButton id="dropdown-basic-button" title={`.${audioType}`} style={{width: "10%",display: "inline"}}  variant="success" onSubmit={(e) => e.preventDefault()}>
                                 <Dropdown.ItemText><b>Formats</b></Dropdown.ItemText>
                                 {audioTypes.map((el,i) => (
                                     <Dropdown.Item key={i} onClick={() => {setAudioType(el); }}>{el}</Dropdown.Item>
@@ -147,7 +154,7 @@ function AudioDownloader(props){
                 <Button variant="danger" onClick={handleClose}>
                     Cancel
                 </Button>
-                <Button variant="primary" type="Submit" onClick={(e) => handleSubmit(e)} id="download">Download</Button>
+                <Button variant="primary" type="Submit" onClick={(e) => handleSubmit(e)} onSubmit={handleSubmit} id="download">Download</Button>
                 </Modal.Footer>
             </Modal>
         </div>

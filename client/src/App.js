@@ -23,8 +23,7 @@ function App() {
 
 
   const [port, setPort] = useState(6547);
-  const [show, setShow] = useState(true);
-  const [hasPort, setHasPort]= useState(false);
+  const [show, setShow] = useState(false);
 
   const Home_Screen = () => {return (<Home/>)};
   const Audio_Screen = () => {return (<AudioDownloader port={port}/>)};
@@ -78,7 +77,6 @@ function App() {
           foundPort = true;
           console.log(`Port ${curPort} made a successful connection`);
           setPort(curPort);
-          setHasPort(!hasPort);
           setShow(false);
         }}
         ).catch(

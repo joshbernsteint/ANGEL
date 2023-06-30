@@ -30,7 +30,14 @@ function VideoDownloader(props){
 
 
     async function downloadVideo(){
-        window.location.assign(`http://localhost:${props.port}/video/${videoData.id}/${itag}/${nameRef.current.value}/${videoType}/${audioQuality}`)
+        fetch(`http://localhost:${props.port}/video/${videoData.id}/${itag}/${nameRef.current.value}/${videoType}/${audioQuality}`).then(res => {
+            if(res.status==200){
+                console.log('Video downloaded!');
+            }
+            else{
+                console.log('ERROR IN Video DOWNLOAD');
+            }
+        })
     }
 
     async function getVideoData(e){

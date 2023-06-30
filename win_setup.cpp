@@ -61,23 +61,23 @@ int _tmain()
     HWND windowReturn;
 
     const char* app_c = "./electron-app.exe";
-    const char* server_c = "C:/Program Files/nodejs/node.exe";
-    const char* server_a = " yt_server/server";
+    const char* server_c = "./server.exe";
+    // const char* server_a = "";
 
     const char* window_name = "__PLACEHOLDER__";
 
     char app_call[32];
     char server_call[64];
-    char server_args[32];
+    // char server_args[32];
 
     fillArray(app_c,app_call,32);
     fillArray(server_c,server_call,64);
-    fillArray(server_a,server_args,32);
+    // fillArray(server_a,server_args,32);
 
     FreeConsole();
     // Start the processes. 
     printf("Starting Processes\n");
-    makeProcess(server_call,server_args,server_si,server_pi);
+    makeProcess(server_call,NULL,server_si,server_pi);
     makeProcess(app_call,NULL,app_si,app_pi);
     printf("Processes Created\n");
     
