@@ -1,0 +1,11 @@
+{
+    "General":{
+        "port": 6547
+    },
+    "Appearance":{
+      "settings_window": "General",
+      "is_dark_mode": false,
+      "mode": {"background": "white", "color": "black"},
+      "text_size": "Medium"
+    }
+}

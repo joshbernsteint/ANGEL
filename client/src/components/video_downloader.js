@@ -31,7 +31,7 @@ function VideoDownloader(props){
 
     async function downloadVideo(){
         fetch(`http://localhost:${props.port}/video/${videoData.id}/${itag}/${nameRef.current.value}/${videoType}/${audioQuality}`).then(res => {
-            if(res.status==200){
+            if(res.status===200){
                 console.log('Video downloaded!');
             }
             else{

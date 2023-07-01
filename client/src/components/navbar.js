@@ -2,7 +2,7 @@ import {Nav,Container, Navbar } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import styles from "./navbar.module.css"
 
-function MyNavbar(){
+function MyNavbar(props){
 
     return (
         <Navbar className={styles.nav} fixed="top" expand='lg'>

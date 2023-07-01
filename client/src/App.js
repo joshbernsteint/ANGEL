@@ -22,16 +22,30 @@ import {Spinner, Modal} from 'react-bootstrap';
 function App() {
 
 
+
+
+  const defaultUserSettings = {
+    General:{
+      port: "6547"
+    },
+    Appearance:{
+      settings_window: "General",
+      is_dark_mode: false,
+      mode: {background: "white", color: "black"},
+      text_size: "Medium",
+    },
+  };
+
+
   const [port, setPort] = useState(6547);
   const [show, setShow] = useState(true);
+  const [userSettings, setUserSettings] = useState(defaultUserSettings);
 
-  const test=useRef(null);
-
-  const Home_Screen = () => {return (<Home/>)};
-  const Audio_Screen = () => {return (<AudioDownloader port={port}/>)};
-  const Video_Screen = () => {return (<VideoDownloader port={port}/>)};
-  const Converter_Screen = () => {return (<Converter port={port}/>)};
-  const Settings_Screen = () => {return (<Settings/>)};
+  const Home_Screen = () => {return (<Home userSettings={userSettings}/>)};
+  const Audio_Screen = () => {return (<AudioDownloader port={port} userSettings={userSettings}/>)};
+  const Video_Screen = () => {return (<VideoDownloader port={port} userSettings={userSettings}/>)};
+  const Converter_Screen = () => {return (<Converter port={port} userSettings={userSettings}/>)};
+  const Settings_Screen = () => {return (<Settings userSettings={userSettings} setUserSettings={setUserSettings} />)};
 
 
   function LoadingServer(){
@@ -95,7 +109,7 @@ function App() {
 
   return (
       <Router>
-      <div className='main'>
+      <div className='main' style={userSettings.Appearance.mode}>
       <MyNavbar/>
         <Routes>
           <Route path="/" exact Component={ Home_Screen }/>
