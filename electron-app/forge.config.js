@@ -37,8 +37,9 @@ module.exports = {
       fs.cpSync(src, dst, {recursive: true});
     },
     postMake: async (config, makeP) => {
-      fs.cpSync(path.join(__dirname,'../server/server.exe'),path.join(__dirname,'/out/electron-app-win32-x64/server.exe'), {recursive: true});
-      fs.cpSync(path.join(__dirname,'../server/node_modules/ffmpeg-static/'),path.join(__dirname,'/out/electron-app-win32-x64/ffmpeg/'), {recursive: true});
+      //Copies server files into the out directory
+      fs.cpSync(path.join(__dirname,'../server/server.exe'),path.join(__dirname,'/out/electron-app-win32-x64/server.exe'), {recursive: true});//Node server
+      fs.cpSync(path.join(__dirname,'../server/node_modules/ffmpeg-static/'),path.join(__dirname,'/out/electron-app-win32-x64/ffmpeg/'), {recursive: true});//Executable needed by the node server
       fs.cpSync(path.join(__dirname,'../win_setup.exe'),path.join(__dirname,'/out/electron-app-win32-x64/win_setup.exe'), {recursive: true});
     }
   }

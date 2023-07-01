@@ -10,7 +10,6 @@ const ytdl = require('ytdl-core');
 const ffmpeg = require('ffmpeg-static');
 const cors = require('cors')
 
-//pkg server.js --target="node18-win-x64"
 
 const app = express();
 
@@ -25,6 +24,14 @@ app.use(cors())//Fixes error
 
 app.get('/test_connection', (req,res) => {
     res.send('Connection successful!');
+});
+
+app.get('/apply_settings', (req,res) => {
+    //TODO: Add apply settings
+});
+
+app.get('/get_settings', (req,res) => {
+    //TODO: Get settings
 });
 
 app.get('/set_download_path', (req, res) => {

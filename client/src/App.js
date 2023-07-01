@@ -12,7 +12,7 @@ import AudioDownloader from './components/audio_downloader';
 import VideoDownloader from './components/video_downloader';
 import Converter from './components/converter';
 import Settings from './components/settings';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {Spinner, Modal} from 'react-bootstrap';
 
 
@@ -23,7 +23,9 @@ function App() {
 
 
   const [port, setPort] = useState(6547);
-  const [show, setShow] = useState(false);
+  const [show, setShow] = useState(true);
+
+  const test=useRef(null);
 
   const Home_Screen = () => {return (<Home/>)};
   const Audio_Screen = () => {return (<AudioDownloader port={port}/>)};
