@@ -1,10 +1,10 @@
 # ANGEL
 
-A: Audio
-N: Node and
-G: Graphical
-E: Electronic
-L: Localizer
+A: Audio   
+N: Node and   
+G: Graphical   
+E: Electronic   
+L: Localizer   
 
 YouTube Downloader for audio and video in Javascript
 
