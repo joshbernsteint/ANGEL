@@ -4,25 +4,36 @@ import "../App.css";
 
 function Settings(props){
 
-    const all_menus = ['General', 'Appearance'];
+    const all_menus = ['General', 'Appearance', 'Downloader','Converter'];
     const text_sizes = ['Extra large','Large','Medium','Small']
     const lightMode = {background: "white", color: "black"};
     const darkMode = {background: "black", color: "white"};
     
+    function SubHeader(props){
+        return (
+            <>
+                <h3>{props.title}</h3>
+                <hr style={{width: "15%"}}/>
+            </>
+        );
+    }
 
     const [settingsJSON, setSettingsJSON] = useState(props.userSettings);
 
     function General(){
         return (
-            <h1>General!</h1>
+            <div>
+                <SubHeader title="Source code"/>
+                Check out the GitHub source code here: {' '}<Button variant="secondary" href="https://github.com/joshbernsteint/ANGEL" target="_blank" style={{marginLeft: "15px"}}>GitHub{' '}<img src="../gitHub.png" width="50px"></img></Button>
+                
+            </div>
         );
     }
 
     function Appearance(){
         return (
             <div>
-                <h3>Display Mode</h3>
-                <hr style={{width: "15%"}}/>
+                <SubHeader title="Display Mode"/>
                 <Container fluid style={{width: "100%"}}>
                     <Row>
                         <Col xs={3}>
@@ -62,15 +73,36 @@ function Settings(props){
         );
     }
 
+    function DownloadOptions(){
+        return (
+            <div>
+                <SubHeader title="Audio"/>
+                <SubHeader title="Video"/>
+            </div>
+        );
+    }
+
+    function ConverterOptions(){
+        return (
+            <div>
+                Lorem Ipsum
+            </div>
+        );
+    }
+
     
     function displaySettings(){
         switch (settingsJSON.Appearance.settings_window) {
             case "General":
                 return (<General/>)
-                case "Appearance":
-                    return (<Appearance/>)
-                    default:
-                        break;
+            case "Appearance":
+                return (<Appearance/>)
+            case "Downloader":
+                return (<DownloadOptions/>)
+            case "Converter":
+                return (<ConverterOptions/>)
+            default:
+                break;
         }
     }
                 

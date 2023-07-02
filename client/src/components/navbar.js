@@ -24,7 +24,6 @@ function MyNavbar(props){
                         <Link to="/audio_downloader" className={styles.nav_item}>Audio Downloader</Link>
                         <Link to="/video_downloader" className={styles.nav_item}>Video Downloader</Link>
                         <Link to="/converter" className={styles.nav_item}>Converter</Link>
-                        <Link to="https://github.com/joshbernsteint/YouTube_Downloader" target="_blank" className={styles.nav_item}>GitHub Source</Link>
                         <Link to="/settings" className={styles.nav_item}>
                             <img src="./settings.png"
                             width="30"

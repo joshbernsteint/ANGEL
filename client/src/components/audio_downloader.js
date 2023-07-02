@@ -111,10 +111,10 @@ function AudioDownloader(props){
                 keyboard={true}
                 onSubmit={e => e.preventDefault()}
             >
-                <Modal.Header closeButton>
+                <Modal.Header closeButton style={props.userSettings.Appearance.mode}>
                     <Modal.Title>Link Parsed Successfully</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
+                <Modal.Body style={props.userSettings.Appearance.mode}>
                     <h5 style={{display: "inline"}}>Title: </h5><p style={{display: "inline"}}>{audioData.title}</p><br/>
                     <h5 style={{display: "inline"}}>Length: </h5><p style={{display: "inline"}}>{convertTime(audioData.length_seconds)}</p><br/>
                     <h5 style={{display: "inline"}}>Video ID: </h5><p style={{display: "inline"}}>{audioData.id}</p><br/>
@@ -164,7 +164,7 @@ function AudioDownloader(props){
                         </Stack>
                     </Stack>
                 </Modal.Body>
-                <Modal.Footer>
+                <Modal.Footer style={props.userSettings.Appearance.mode}>
                 <Button variant="danger" onClick={handleClose}>
                     Cancel
                 </Button>

@@ -30,16 +30,29 @@ app.get('/test_connection', (req,res) => {
 app.get('/apply_settings', (req,res) => {
     const string_data = JSON.stringify(req.query.settings)
     fs.writeFileSync(settings_path,string_data);
+    console.log('Changing settings');
     res.send('Settings changed!');
 });
 
 app.get('/get_settings', (req,res) => {
     if(fs.existsSync(settings_path)){
         const data = fs.readFileSync(settings_path);
-        const user_settings = JSON.parse(data);
-        res.send(user_settings);
+        try {
+            const user_settings = JSON.parse(data);
+            if(Object.keys(user_settings).length){
+                res.send(user_settings);
+            }
+            else{
+                console.log('Sending Error');
+                res.send({error: true})
+            }
+        } catch (error) {
+            console.log('Error parsing JSON',data);
+            res.send({error: true});
+        }
     }
     else{
+        console.log('Creating file...');
         var new_settings = fs.createWriteStream(settings_path);
         new_settings.write("{}");
         new_settings.end();
@@ -83,7 +96,7 @@ app.get('/get_data', async (req,res) => {
 app.get('/video/:id/:itag/:name/:format/:audio', async (req,res) => {
     const audio = (req.params.audio === "High") ?  ytdl(req.params.id, { quality: 'highestaudio' }): ytdl(req.params.id, { quality: 'lowestaudio' })
     const video = ytdl(req.params.id, { quality: req.params.itag });
-    const ffmpegProcess = cp.spawn(ffmpeg_path, [
+    const ffmpegProcess = cp.spawn(ffmpeg, [
         // Remove ffmpeg's console spamming
         '-loglevel', '8', '-hide_banner',
         // Redirect/Enable progress messages
@@ -130,7 +143,7 @@ app.get('/audio/:id/:qual/:name/:format', async (req,res) => {
     const fileName = `${req.params.name}.${req.params.format}`
 
 
-    const ffmpegProcess = cp.spawn(ffmpeg_path, [
+    const ffmpegProcess = cp.spawn(ffmpeg, [
         // Remove ffmpeg's console spamming
         '-loglevel', '8', '-hide_banner',
         // Redirect/Enable progress messages

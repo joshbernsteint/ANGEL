@@ -116,10 +116,10 @@ function VideoDownloader(props){
                 backdrop="static"
                 keyboard={false}
                 >
-                <Modal.Header closeButton>
+                <Modal.Header closeButton style={props.userSettings.Appearance.mode}>
                     <Modal.Title>Link Parsed Successfully</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
+                <Modal.Body style={props.userSettings.Appearance.mode}>
                     <h5 style={{display: "inline"}}>Title: </h5><p style={{display: "inline"}}>{videoData.title}</p><br/>
                     <h5 style={{display: "inline"}}>Length: </h5><p style={{display: "inline"}}>{convertTime(videoData.length_seconds)}</p><br/>
                     <h5 style={{display: "inline"}}>Video ID: </h5><p style={{display: "inline"}}>{videoData.id}</p><br/>
@@ -183,7 +183,7 @@ function VideoDownloader(props){
                             </Stack>
                     </Stack> 
                 </Modal.Body>
-                <Modal.Footer>
+                <Modal.Footer style={props.userSettings.Appearance.mode}>
                 <Button variant="danger" onClick={handleClose}>
                     Cancel
                 </Button>
