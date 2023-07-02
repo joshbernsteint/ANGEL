@@ -34,6 +34,7 @@ module.exports = {
   hooks: {
     packageAfterCopy: async (config, buildPath, electronVersion, platform, arch) => {
       var dst = buildPath;
+      var src = path.join(__dirname,'../client/build/');
       fs.cpSync(src, dst, {recursive: true});
     },
     postMake: async (config, makeP) => {

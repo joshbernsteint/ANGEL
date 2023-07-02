@@ -8,6 +8,18 @@ Joshua Bernstein
 #include <stdio.h>
 #include <tchar.h>
 
+#define window_name "__PLACEHOLDER__"
+#define server_call_const "./server.exe"
+#define RUN_PROCS 0
+
+typedef struct server_data {
+    STARTUPINFO server_info;
+    PROCESS_INFORMATION server;
+} processes_data;
+
+
+
+
 /**
  * Creates a child process
  * @param cmd: Path to the executable
@@ -30,6 +42,7 @@ int makeProcess(char* cmd,char* args ,STARTUPINFO &si, PROCESS_INFORMATION &pi){
     }
 }
 
+
 /**
  * Fills an empty array of chars with the values of a cha* cosnt
  * @param str: A const char*
@@ -49,6 +62,35 @@ int fillArray(const char* str,char* target,size_t len){
     }
 }
 
+bool isOpen(const char* window){
+    HWND windowReturn;
+    windowReturn = FindWindow(NULL,window);//Making sure the window was actually closed
+    if(windowReturn == NULL){
+        return false;
+    }
+    else{
+        return true;
+    }
+}
+
+DWORD maintainServer(LPVOID server_info){
+    processes_data* info = (processes_data*)server_info;
+    char call[64];
+    fillArray(server_call_const,call,64);
+
+    bool appOpen = true;
+    while(appOpen){
+        WaitForSingleObject(info->server.hProcess, INFINITE);
+        if((appOpen = isOpen(window_name))){
+            makeProcess(call,NULL,info->server_info,info->server);
+            printf("Restarting server...\n");
+        }
+    }
+
+    return 0;
+}
+
+
 int _tmain()
 {
     STARTUPINFO server_si;
@@ -57,14 +99,13 @@ int _tmain()
     STARTUPINFO app_si;
     PROCESS_INFORMATION app_pi;
 
-    bool windowOpened = true;
-    HWND windowReturn;
+    server_data thread_struct;
+    HANDLE thread_handle;
 
     const char* app_c = "./electron-app.exe";
-    const char* server_c = "./server.exe";
+    const char* server_c = server_call_const;
     // const char* server_a = "";
-
-    const char* window_name = "__PLACEHOLDER__";
+    bool windowOpened = true;
 
     char app_call[32];
     char server_call[64];
@@ -74,36 +115,37 @@ int _tmain()
     fillArray(server_c,server_call,64);
     // fillArray(server_a,server_args,32);
 
+    #ifdef RUN_PROCS
     FreeConsole();
     // Start the processes. 
     printf("Starting Processes\n");
     makeProcess(server_call,NULL,server_si,server_pi);
     makeProcess(app_call,NULL,app_si,app_pi);
     printf("Processes Created\n");
-    
-    
 
+    thread_handle = CreateThread(NULL,0,maintainServer,&thread_struct,0, NULL);
+    #endif
+
+    thread_struct.server = server_pi;
+    thread_struct.server_info = server_si;
+    
+    #ifdef RUN_PROCS
     // Wait until app process exits.
     while(windowOpened){
         WaitForSingleObject( app_pi.hProcess, INFINITE ); //Wait for the app to be closed by the user
-        windowReturn = FindWindow(NULL,window_name);//Making sure the window was actually closed
-        if(windowReturn == NULL){
-            printf("App closed\n");
-            windowOpened = false;
-        }
-        else{
-            printf("App continuing to run!");
-        }
+        windowOpened = isOpen(window_name);
     }
     printf("Server Terminating\n"); 
     TerminateProcess(server_pi.hProcess, 0);//Terminates the server that downloads the videos
-    
+    TerminateThread(thread_handle, 0);
+
 
     // Close process and thread handles. 
     CloseHandle( app_pi.hProcess );
     CloseHandle( app_pi.hThread );
     CloseHandle( server_pi.hProcess );
     CloseHandle( server_pi.hThread );
+    #endif
 
 
     printf("Exiting Parent...\n"); 

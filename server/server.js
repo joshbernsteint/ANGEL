@@ -14,7 +14,7 @@ const cors = require('cors')
 const app = express();
 
 var downloadPath = "";
-const settings_path = path.resolve(__dirname,'./userSettings.json');
+const settings_path = './userSettings.json';
 const ffmpeg_path = "ffmpeg/ffmpeg.exe";
 var port = 6547;//Default value for port is 6547
 
@@ -34,9 +34,17 @@ app.get('/apply_settings', (req,res) => {
 });
 
 app.get('/get_settings', (req,res) => {
-    const data = fs.readFileSync(settings_path);
-    const user_settings = JSON.parse(data);
-    res.send(user_settings);
+    if(fs.existsSync(settings_path)){
+        const data = fs.readFileSync(settings_path);
+        const user_settings = JSON.parse(data);
+        res.send(user_settings);
+    }
+    else{
+        var new_settings = fs.createWriteStream(settings_path);
+        new_settings.write("{}");
+        new_settings.end();
+        res.send({error: true});
+    }
 });
 
 
@@ -75,7 +83,7 @@ app.get('/get_data', async (req,res) => {
 app.get('/video/:id/:itag/:name/:format/:audio', async (req,res) => {
     const audio = (req.params.audio === "High") ?  ytdl(req.params.id, { quality: 'highestaudio' }): ytdl(req.params.id, { quality: 'lowestaudio' })
     const video = ytdl(req.params.id, { quality: req.params.itag });
-    const ffmpegProcess = cp.spawn(ffmpeg, [
+    const ffmpegProcess = cp.spawn(ffmpeg_path, [
         // Remove ffmpeg's console spamming
         '-loglevel', '8', '-hide_banner',
         // Redirect/Enable progress messages
@@ -122,7 +130,7 @@ app.get('/audio/:id/:qual/:name/:format', async (req,res) => {
     const fileName = `${req.params.name}.${req.params.format}`
 
 
-    const ffmpegProcess = cp.spawn(ffmpeg, [
+    const ffmpegProcess = cp.spawn(ffmpeg_path, [
         // Remove ffmpeg's console spamming
         '-loglevel', '8', '-hide_banner',
         // Redirect/Enable progress messages
