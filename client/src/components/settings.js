@@ -24,7 +24,7 @@ function Settings(props){
         return (
             <div>
                 <SubHeader title="Source code"/>
-                Check out the GitHub source code here: {' '}<Button variant="secondary" href="https://github.com/joshbernsteint/ANGEL" target="_blank" style={{marginLeft: "15px"}}>GitHub{' '}<img src="../gitHub.png" width="50px"></img></Button>
+                Check out the GitHub source code here: {' '}<Button variant="secondary" href="https://github.com/joshbernsteint/ANGEL" target="_blank" style={{marginLeft: "15px"}}>GitHub{' '}<img src="./gitHub.png" width="50px"></img></Button>
                 
             </div>
         );

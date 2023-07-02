@@ -96,7 +96,7 @@ app.get('/get_data', async (req,res) => {
 app.get('/video/:id/:itag/:name/:format/:audio', async (req,res) => {
     const audio = (req.params.audio === "High") ?  ytdl(req.params.id, { quality: 'highestaudio' }): ytdl(req.params.id, { quality: 'lowestaudio' })
     const video = ytdl(req.params.id, { quality: req.params.itag });
-    const ffmpegProcess = cp.spawn(ffmpeg, [
+    const ffmpegProcess = cp.spawn(ffmpeg_path, [
         // Remove ffmpeg's console spamming
         '-loglevel', '8', '-hide_banner',
         // Redirect/Enable progress messages
@@ -143,7 +143,7 @@ app.get('/audio/:id/:qual/:name/:format', async (req,res) => {
     const fileName = `${req.params.name}.${req.params.format}`
 
 
-    const ffmpegProcess = cp.spawn(ffmpeg, [
+    const ffmpegProcess = cp.spawn(ffmpeg_path, [
         // Remove ffmpeg's console spamming
         '-loglevel', '8', '-hide_banner',
         // Redirect/Enable progress messages
@@ -171,18 +171,18 @@ app.get('/audio/:id/:qual/:name/:format', async (req,res) => {
     })
     ffmpegProcess.on('close', async () => {
         // console.log(`Done downloading audio ID ${req.params.id}`)
-        // res.download(path.resolve(`./${fileName}`), (err) => {
-        //     if(err){
-        //         // console.log(err)
-        //     }
-        //     else{
-        //         console.log(`Deleting File ${fileName}`)
-        //         fs.unlinkSync(path.resolve(`./${fileName}`));
+        res.download(path.resolve(`./${fileName}`), (err) => {
+            if(err){
+                // console.log(err)
+            }
+            else{
+                // console.log(`Deleting File ${fileName}`)
+                // fs.unlinkSync(path.resolve(`./${fileName}`));
 
-        //     }
-        // })
-        fs.copyFileSync(path.resolve(`./${fileName}`),path.resolve(`C:/Users/${curUser}/Music/${fileName}`));
-        fs.unlinkSync(path.resolve(`./${fileName}`));
+            }
+        })
+        // fs.copyFileSync(path.resolve(`./${fileName}`),path.resolve(`C:/Users/${curUser}/Music/${fileName}`));
+        // fs.unlinkSync(path.resolve(`./${fileName}`));
         res.status(200).send("All good!");
     })
 });

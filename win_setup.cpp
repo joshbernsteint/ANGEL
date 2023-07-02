@@ -108,6 +108,7 @@ DWORD maintainServer(LPVOID server_info){
 int _tmain()
 {
     FreeConsole();
+
     STARTUPINFO server_si;
     PROCESS_INFORMATION server_pi;
 
@@ -137,7 +138,7 @@ int _tmain()
     makeProcess(app_call,NULL,app_si,app_pi);
     printf("Processes Created\n");
 
-    thread_handle = CreateThread(NULL,0,maintainServer,&thread_struct,0, NULL);
+    // thread_handle = CreateThread(NULL,0,maintainServer,&thread_struct,0, NULL);
     #endif
 
     thread_struct.server = server_pi;
@@ -151,7 +152,7 @@ int _tmain()
     }
     printf("Server Terminating\n"); 
     TerminateProcess(server_pi.hProcess, 0);//Terminates the server that downloads the videos
-    TerminateThread(thread_handle, 0);
+    // TerminateThread(thread_handle, 0);
 
 
     // Close process and thread handles. 
@@ -159,6 +160,7 @@ int _tmain()
     CloseHandle( app_pi.hThread );
     CloseHandle( server_pi.hProcess );
     CloseHandle( server_pi.hThread );
+    // CloseHandle(thread_handle);
     #endif
 
 
