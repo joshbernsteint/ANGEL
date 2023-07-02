@@ -1,5 +1,6 @@
 import "../App.css"
-import { Button, Form, Stack, Modal, Accordion, Dropdown, DropdownButton, OverlayTrigger, Popover, CloseButton } from "react-bootstrap";
+import { Button, Form, Stack, Modal, Accordion, Dropdown, DropdownButton, OverlayTrigger, Popover, CloseButton,
+Toast, ToastContainer } from "react-bootstrap";
 import { useRef, useState } from "react";
 import { convertTime } from "../tools/utils";
 import axios from 'axios'
@@ -13,6 +14,8 @@ function VideoDownloader(props){
     const nameRef = useRef(null);
 
     const [videoData, setVideoData] = useState({});
+    const [fileName, setFileName] = useState("");
+    const [showNotification, setNotification] = useState(false);
     const [show, setShow] = useState(false)
     const [videoType, setVideoType] = useState('mp4');
     const [qualityOptions, setQualityOptions] = useState({});
@@ -30,9 +33,11 @@ function VideoDownloader(props){
 
 
     async function downloadVideo(){
+        setFileName(`${nameRef.current.value}.${videoType}`)
         fetch(`http://localhost:${props.port}/video/${videoData.id}/${itag}/${nameRef.current.value}/${videoType}/${audioQuality}`).then(res => {
             if(res.status===200){
-                console.log('Video downloaded!');
+                console.log(`Video ${fileName} downloaded!`);
+                setNotification(true);
             }
             else{
                 console.log('ERROR IN Video DOWNLOAD');
@@ -93,6 +98,18 @@ function VideoDownloader(props){
                     </Stack>
                 </Form.Group>
             </Form>
+
+            <ToastContainer position="middle-end">
+                <Toast onClose={() => setNotification(false)} show={showNotification} delay={3000} autohide bg="success">
+                    <Toast.Header>
+                        ✅
+                        <strong className="me-auto">Download Successful!</strong>
+                    </Toast.Header>
+                    <Toast.Body>Video file: {fileName} has been downloaded. This message will disappear in 3 seconds.</Toast.Body>
+                </Toast>
+            </ToastContainer>
+
+
              <Modal
                 show={show}
                 onHide={handleClose}

@@ -100,7 +100,11 @@
 .apply_button{
     margin-left: auto;
     margin-right: 10rem;
-    width: 10rem;
+    width: 30rem;
+}
+
+.settings_button{
+    width: 30rem;
 }
 
 .center_title{

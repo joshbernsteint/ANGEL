@@ -13,7 +13,8 @@ import VideoDownloader from './components/video_downloader';
 import Converter from './components/converter';
 import Settings from './components/settings';
 import { useState, useEffect, useRef } from 'react';
-import {Spinner, Modal} from 'react-bootstrap';
+import {Spinner, Modal, Button } from 'react-bootstrap';
+import axios from 'axios';
 
 
 
@@ -24,9 +25,10 @@ function App() {
 
 
 
-  const defaultUserSettings = {
+const defaultUserSettings = {
     General:{
-      port: "6547"
+      port: "6547",
+      show_download_popup: true,
     },
     Appearance:{
       settings_window: "General",
@@ -39,13 +41,40 @@ function App() {
 
   const [port, setPort] = useState(6547);
   const [show, setShow] = useState(true);
+  const [changeCount, setChangeCount] = useState(-1);
   const [userSettings, setUserSettings] = useState(defaultUserSettings);
 
   const Home_Screen = () => {return (<Home userSettings={userSettings}/>)};
   const Audio_Screen = () => {return (<AudioDownloader port={port} userSettings={userSettings}/>)};
   const Video_Screen = () => {return (<VideoDownloader port={port} userSettings={userSettings}/>)};
   const Converter_Screen = () => {return (<Converter port={port} userSettings={userSettings}/>)};
-  const Settings_Screen = () => {return (<Settings userSettings={userSettings} setUserSettings={setUserSettings} />)};
+  const Settings_Screen = () => {return (<Settings userSettings={userSettings} setUserSettings={setUserSettings} default={defaultUserSettings} />)};
+
+
+  useEffect(() => {
+    async function setSettings(){
+        let settings_response = () => {
+          return new Promise(function(resolve, reject){
+              axios.get(`http://localhost:${port}/apply_settings`,{ params: {settings: userSettings}}).then(
+                  response => resolve(response)
+              );
+          });
+      }
+      let responseData = await settings_response();
+      let settings_data = responseData.data
+      console.log(settings_data);
+    }
+
+
+    if(changeCount > 1){
+      console.log('Changing...');
+      setSettings();
+
+    }
+    setChangeCount(changeCount+1);
+  
+  }, [userSettings]);
+
 
 
   function LoadingServer(){
@@ -83,7 +112,7 @@ function App() {
   // Finds the server port for downloading images
   useEffect(()=>{
     async function findPort(){
-      var curPort = 6547;
+      var curPort = port;
       var foundPort = false;
       
       //TODO make this not suck
@@ -102,8 +131,12 @@ function App() {
       }
     }
 
-    findPort();
-  },[]);
+    async function wrapper(){
+        await findPort();
+        fetch(`http://localhost:${port}/get_settings`).then(res => {return res.json()}).then(obj => setUserSettings(obj));
+    }
+     wrapper();
+  }, []);
 
 
 

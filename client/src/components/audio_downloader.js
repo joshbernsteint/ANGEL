@@ -1,11 +1,9 @@
 import "../App.css"
 import { Button, Form, Stack, Modal, Accordion, OverlayTrigger, Popover, CloseButton, DropdownButton,
-Dropdown } from "react-bootstrap";
+Dropdown, Toast, ToastContainer } from "react-bootstrap";
 import { useRef, useState } from "react";
 import { convertTime  } from "../tools/utils";
 import axios from 'axios'
-
-
 
 function AudioDownloader(props){
 
@@ -15,6 +13,8 @@ function AudioDownloader(props){
     const urlRef = useRef(null)
     const nameRef = useRef(null)
     const [show, setShow] = useState(false);
+    const [fileName, setFileName] = useState("");
+    const [showNotification, setNotification] = useState(false);
     const [nameError, setNameError] = useState(false);
     const [audioQuality, setAudioQuality] = useState('High');
     const [audioData, setAudioData] = useState({});
@@ -28,8 +28,8 @@ function AudioDownloader(props){
         }
         else{
             setNameError(true);
-            downloadAudio();
             handleClose();
+            downloadAudio();
         }
     }
     
@@ -39,9 +39,11 @@ function AudioDownloader(props){
 
 
     async function downloadAudio(){
+        setFileName(`${nameRef.current.value}.${audioType}`)
         fetch(`http://localhost:${props.port}/audio/${audioData.id}/${audioQuality}/${nameRef.current.value}/${audioType}`).then(res => {
             if(res.status==200){
-                console.log('Audio downloaded!');
+                console.log(`${fileName} downloaded.`);
+                setNotification(true);
             }
             else{
                 console.log('ERROR IN AUDIO DOWNLOAD');
@@ -90,6 +92,18 @@ function AudioDownloader(props){
                     </Stack>
                 </Form.Group>
             </Form>
+
+            <ToastContainer position="middle-end">
+                <Toast onClose={() => setNotification(false)} show={showNotification} delay={3000} autohide bg="success">
+                    <Toast.Header>
+                        ✅
+                        <strong className="me-auto">Download Successful!</strong>
+                    </Toast.Header>
+                    <Toast.Body>Audio file: {fileName} has been downloaded. This message will disappear in 3 seconds.</Toast.Body>
+                </Toast>
+            </ToastContainer>
+
+
             <Modal
                 show={show}
                 onHide={handleClose}

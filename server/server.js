@@ -14,6 +14,7 @@ const cors = require('cors')
 const app = express();
 
 var downloadPath = "";
+const settings_path = path.resolve(__dirname,'./userSettings.json');
 const ffmpeg_path = "ffmpeg/ffmpeg.exe";
 var port = 6547;//Default value for port is 6547
 
@@ -27,18 +28,17 @@ app.get('/test_connection', (req,res) => {
 });
 
 app.get('/apply_settings', (req,res) => {
-    //TODO: Add apply settings
+    const string_data = JSON.stringify(req.query.settings)
+    fs.writeFileSync(settings_path,string_data);
+    res.send('Settings changed!');
 });
 
 app.get('/get_settings', (req,res) => {
-    //TODO: Get settings
+    const data = fs.readFileSync(settings_path);
+    const user_settings = JSON.parse(data);
+    res.send(user_settings);
 });
 
-app.get('/set_download_path', (req, res) => {
-    downloadPath = req.query.path;
-    console.log(`Setting file download path to ${downloadPath}`);
-    res.status(200);
-});
 
 //For getting video ID
 app.get('/get_id', async(req,res) => {
@@ -75,7 +75,7 @@ app.get('/get_data', async (req,res) => {
 app.get('/video/:id/:itag/:name/:format/:audio', async (req,res) => {
     const audio = (req.params.audio === "High") ?  ytdl(req.params.id, { quality: 'highestaudio' }): ytdl(req.params.id, { quality: 'lowestaudio' })
     const video = ytdl(req.params.id, { quality: req.params.itag });
-    const ffmpegProcess = cp.spawn(ffmpeg_path, [
+    const ffmpegProcess = cp.spawn(ffmpeg, [
         // Remove ffmpeg's console spamming
         '-loglevel', '8', '-hide_banner',
         // Redirect/Enable progress messages
@@ -109,7 +109,7 @@ app.get('/video/:id/:itag/:name/:format/:audio', async (req,res) => {
             }
             else{
                 // console.log(`Deleting File ${req.params.id}`)
-                fs.unlinkSync(path.resolve( `./${req.params.name}.${req.params.format}`));
+                // fs.unlinkSync(path.resolve( `./${req.params.name}.${req.params.format}`));
 
             }
         })
@@ -122,7 +122,7 @@ app.get('/audio/:id/:qual/:name/:format', async (req,res) => {
     const fileName = `${req.params.name}.${req.params.format}`
 
 
-    const ffmpegProcess = cp.spawn(ffmpeg_path, [
+    const ffmpegProcess = cp.spawn(ffmpeg, [
         // Remove ffmpeg's console spamming
         '-loglevel', '8', '-hide_banner',
         // Redirect/Enable progress messages

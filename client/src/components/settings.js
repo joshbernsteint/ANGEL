@@ -1,4 +1,4 @@
-import { Stack, Tabs, Tab, Container, Row, Col, Form, Button } from "react-bootstrap";
+import { Stack, Tabs, Tab, Container, Row, Col, Form, Button, Modal } from "react-bootstrap";
 import { useState } from 'react'
 import "../App.css";
 
@@ -8,6 +8,7 @@ function Settings(props){
     const text_sizes = ['Extra large','Large','Medium','Small']
     const lightMode = {background: "white", color: "black"};
     const darkMode = {background: "black", color: "white"};
+    
 
     const [settingsJSON, setSettingsJSON] = useState(props.userSettings);
 
@@ -61,21 +62,42 @@ function Settings(props){
         );
     }
 
-
-
+    
     function displaySettings(){
         switch (settingsJSON.Appearance.settings_window) {
             case "General":
                 return (<General/>)
-            case "Appearance":
-                return (<Appearance/>)
-            default:
-                break;
+                case "Appearance":
+                    return (<Appearance/>)
+                    default:
+                        break;
         }
     }
-
-
-
+                
+                
+    const [show, setShow] = useState(false);
+    const [applyingDefault, setApplyingDefault] = useState(false);
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
+    function handleSettingsSet(target){
+        
+        return (
+            <Modal show={show} onHide={handleClose} backdrop="static" animation={false}>
+                <Modal.Header>
+                <Modal.Title>Are you sure?</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>If you overwrite the settings, there is no way to undo without manually changing everything back.</Modal.Body>
+                <Modal.Footer>
+                <Button variant="secondary" onClick={handleClose}>
+                    Actually, nevermind
+                </Button>
+                <Button variant="warning" onClick={e => props.setUserSettings(target)}>
+                    Yes I'm sure
+                </Button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
 
 
     return (
@@ -101,7 +123,32 @@ function Settings(props){
                     <h1 className="center_title" style={{borderColor: (props.userSettings.Appearance.is_dark_mode ? "white" : "black")}}>{settingsJSON.Appearance.settings_window}</h1>
                     {displaySettings()}
                     <div className="apply_button">
-                        <Button variant="success" className="apply_button" type="submit" onClick={e => props.setUserSettings(settingsJSON)}><b>Apply</b></Button>
+                        <Stack direction="horizontal" gap={2}>
+                            <Button variant="danger" className="settings_button" type="submit" onClick={e => {handleShow(); setApplyingDefault(true);}}><b>Reset to Default</b></Button>
+                            <Button variant="success" className="apply_button" type="submit" onClick={handleShow}><b>Apply</b></Button>
+
+
+
+
+
+
+                            <Modal show={show} onHide={handleClose} backdrop="static" animation={false}>
+                                <Modal.Header>
+                                <Modal.Title>Are you sure?</Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>If you overwrite the settings, there is no way to undo without manually changing everything back.</Modal.Body>
+                                <Modal.Footer>
+                                <Button variant="secondary" onClick={handleClose}>
+                                    Actually, nevermind
+                                </Button>
+                                <Button variant="warning" onClick={e => {(applyingDefault ? props.setUserSettings(props.default) : props.setUserSettings(settingsJSON))}}>
+                                    Yes I'm sure
+                                </Button>
+                                </Modal.Footer>
+                            </Modal>
+                            
+                            
+                        </Stack>
                     </div>
                 </Stack>
             </Stack>
