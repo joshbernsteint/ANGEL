@@ -7,6 +7,7 @@ Joshua Bernstein
 #include <signal.h>
 #include <sys/wait.h>
 #include <stdio.h>
+#include <pthread.h>
 
 
 
@@ -15,7 +16,7 @@ Joshua Bernstein
 
 int main(){
 
-    pid_t app=0, server=0;
+    pid_t app = 0, server = 0;
 
     char* app_path = "";
     char* server_path = "";

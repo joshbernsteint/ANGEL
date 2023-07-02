@@ -12,11 +12,14 @@ Joshua Bernstein
 #define server_call_const "./server.exe"
 #define RUN_PROCS 0
 
+/**
+ * @struct server_data
+ * @brief Contains fields for the thread function to execute
+*/
 typedef struct server_data {
     STARTUPINFO server_info;
     PROCESS_INFORMATION server;
 } processes_data;
-
 
 
 
@@ -62,9 +65,15 @@ int fillArray(const char* str,char* target,size_t len){
     }
 }
 
+
+/**
+ * Checks if the window specified by window is open on the desktop
+ * @param window: The name of the window that will be searched on the desktop
+ * @return True if the window exists, false otherwise
+*/
 bool isOpen(const char* window){
     HWND windowReturn;
-    windowReturn = FindWindow(NULL,window);//Making sure the window was actually closed
+    windowReturn = FindWindow(NULL,window);
     if(windowReturn == NULL){
         return false;
     }
@@ -73,6 +82,11 @@ bool isOpen(const char* window){
     }
 }
 
+/**
+ * Thread function to ensure the server process is continously running while the app is active
+ * @param server_info: A pointer to a server_data struct
+ * @return 0
+*/
 DWORD maintainServer(LPVOID server_info){
     processes_data* info = (processes_data*)server_info;
     char call[64];
@@ -93,6 +107,7 @@ DWORD maintainServer(LPVOID server_info){
 
 int _tmain()
 {
+    FreeConsole();
     STARTUPINFO server_si;
     PROCESS_INFORMATION server_pi;
 
@@ -115,9 +130,8 @@ int _tmain()
     fillArray(server_c,server_call,64);
     // fillArray(server_a,server_args,32);
 
-    #ifdef RUN_PROCS
-    FreeConsole();
     // Start the processes. 
+    #ifdef RUN_PROCS
     printf("Starting Processes\n");
     makeProcess(server_call,NULL,server_si,server_pi);
     makeProcess(app_call,NULL,app_si,app_pi);
