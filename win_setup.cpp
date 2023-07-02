@@ -8,7 +8,7 @@ Joshua Bernstein
 #include <stdio.h>
 #include <tchar.h>
 
-#define window_name "__PLACEHOLDER__"
+#define window_name "ANGEL"
 #define server_call_const "./server.exe"
 #define RUN_PROCS 0
 

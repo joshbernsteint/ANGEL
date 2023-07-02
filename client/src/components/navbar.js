@@ -10,12 +10,12 @@ function MyNavbar(props){
                 <Navbar.Brand to="/" className={styles.nav_brand}>
                     <img
                     alt="brand icon"
-                    src="./icon.ico"
-                    width="35"
-                    height="35"
+                    src="./angel.png"
+                    width="40"
+                    height="40"
                     className="d-inline-block align-top"
                     />{' '}
-                    __PLACEHOLDER__
+                    ANGEL
                 </Navbar.Brand>
                 <Navbar.Toggle aria-controls = "basic-navbar-nav"/>
                 <Navbar.Collapse id = "basic-navbar-nav" style = {{alignItems: "right",justifyContent:"right"}}>
