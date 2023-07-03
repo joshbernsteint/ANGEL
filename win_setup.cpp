@@ -1,7 +1,7 @@
 /*
 
 Joshua Bernstein
-6/27/2023
+Windows executable to run ANGEL program
 
 */
 #include <windows.h>
@@ -11,6 +11,8 @@ Joshua Bernstein
 #define window_name "ANGEL"
 #define server_call_const "./server.exe"
 #define RUN_PROCS 0
+
+#define PRINT(str) printf("%s\n",str) //I'm lazy and don't like writing the f at the end
 
 /**
  * @struct server_data
@@ -47,13 +49,13 @@ int makeProcess(char* cmd,char* args ,STARTUPINFO &si, PROCESS_INFORMATION &pi){
 
 
 /**
- * Fills an empty array of chars with the values of a cha* cosnt
+ * Fills an empty array of chars with the values of a char* cosnt
  * @param str: A const char*
  * @param target: A pointer to an array of chars
  * @param len: The size of the array of chars
  * @return An integer representing if filling the array was successful(0) or not(-1)
 */
-int fillArray(const char* str,char* target,size_t len){
+int fillArray(const char* str,char* target,const size_t len){
     size_t str_length = strlen(str)+1;
     if(str_length > len){
         return -1;
@@ -96,9 +98,8 @@ DWORD maintainServer(LPVOID server_info){
     while(appOpen){
         WaitForSingleObject(info->server.hProcess, INFINITE);
         if((appOpen = isOpen(window_name))){
-            int result = makeProcess(call,NULL,info->server_info,info->server);
-            printf("%d\n",result);
-            printf("Restarting server...\n");
+            makeProcess(call,NULL,info->server_info,info->server);
+            PRINT("Restarting server...");
         }
     }
 
@@ -108,7 +109,7 @@ DWORD maintainServer(LPVOID server_info){
 
 int _tmain()
 {
-    FreeConsole();
+    FreeConsole();//Gets rid of the console popup
 
     STARTUPINFO server_si;
     PROCESS_INFORMATION server_pi;
@@ -125,20 +126,18 @@ int _tmain()
 
     char app_call[32];
     char server_call[64];
-    // char server_args[32];
 
     fillArray(app_c,app_call,32);
     fillArray(server_c,server_call,64);
-    // fillArray(server_a,server_args,32);
 
 
 
     // Start the processes. 
     #ifdef RUN_PROCS
-    printf("Starting Processes\n");
+    PRINT("Starting Processes");
     makeProcess(server_call,NULL,server_si,server_pi);
     makeProcess(app_call,NULL,app_si,app_pi);
-    printf("Processes Created\n");
+    PRINT("Processes Created");
 
     thread_struct.server = server_pi;
     thread_struct.server_info = server_si;
@@ -151,22 +150,22 @@ int _tmain()
     // Wait until app process exits.
     while(windowOpened){
         WaitForSingleObject( app_pi.hProcess, INFINITE ); //Wait for the app to be closed by the user
-        windowOpened = isOpen(window_name);
+        windowOpened = isOpen(window_name);//Checks to see if the app window is still open (in case the wait failed)
     }
-    printf("Server Terminating\n"); 
-    TerminateProcess(server_pi.hProcess, 0);//Terminates the server that downloads the videos
+    PRINT("Server Terminating"); 
+    TerminateProcess(server_pi.hProcess, 0);//Terminates the server/server thread that downloads the videos
     TerminateThread(thread_handle, 0);
 
 
     // Close process and thread handles. 
-    CloseHandle( app_pi.hProcess );
-    CloseHandle( app_pi.hThread );
-    CloseHandle( server_pi.hProcess );
-    CloseHandle( server_pi.hThread );
+    CloseHandle(app_pi.hProcess);
+    CloseHandle(app_pi.hThread);
+    CloseHandle(server_pi.hProcess);
+    CloseHandle(server_pi.hThread);
     CloseHandle(thread_handle);
     #endif
 
 
-    printf("Exiting Parent...\n"); 
+    PRINT("Exiting Parent..."); 
     exit(0);
 }
