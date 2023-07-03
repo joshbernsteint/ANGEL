@@ -66,7 +66,7 @@ const defaultUserSettings = {
     }
 
 
-    if(changeCount > 1){
+    if(changeCount > 0){
       console.log('Changing...');
       setSettings();
 

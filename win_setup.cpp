@@ -19,8 +19,8 @@ Windows executable to run ANGEL program
  * @brief Contains fields for the thread function to execute
 */
 typedef struct server_data {
-    STARTUPINFO server_info;
-    PROCESS_INFORMATION server;
+    PROCESS_INFORMATION* app;
+    PROCESS_INFORMATION* server;
 } processes_data;
 
 
@@ -67,7 +67,6 @@ int fillArray(const char* str,char* target,const size_t len){
     }
 }
 
-
 /**
  * Checks if the window specified by window is open on the desktop
  * @param window: The name of the window that will be searched on the desktop
@@ -91,19 +90,10 @@ bool isOpen(const char* window){
 */
 DWORD maintainServer(LPVOID server_info){
     processes_data* info = (processes_data*)server_info;
-    char call[64];
-    fillArray(server_call_const,call,64);
-
-    bool appOpen = true;
-    while(appOpen){
-        WaitForSingleObject(info->server.hProcess, INFINITE);
-        if((appOpen = isOpen(window_name))){
-            makeProcess(call,NULL,info->server_info,info->server);
-            PRINT("Restarting server...");
-        }
-    }
-
-    return 0;
+    WaitForSingleObject(info->server->hProcess, INFINITE);
+    MessageBoxA(NULL,"Internal Server crashed. The program will now close. If this problem persists, please report it to the GitHub page under 'Issues'. ","Internal Server Error", MB_ICONERROR);
+    TerminateProcess(info->app->hProcess, 0);//Terminates the server/server thread that downloads the videos
+    return -1;
 }
 
 
@@ -139,8 +129,8 @@ int _tmain()
     makeProcess(app_call,NULL,app_si,app_pi);
     PRINT("Processes Created");
 
-    thread_struct.server = server_pi;
-    thread_struct.server_info = server_si;
+    thread_struct.server = &server_pi;
+    thread_struct.app = &app_pi;
 
     thread_handle = CreateThread(NULL,0,maintainServer,&thread_struct,0, NULL);
     #endif

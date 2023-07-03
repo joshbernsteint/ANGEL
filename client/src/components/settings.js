@@ -136,8 +136,8 @@ function Settings(props){
                     {displaySettings()}
                     <div className="apply_button">
                         <Stack direction="horizontal" gap={2}>
-                            <Button variant="danger" className="settings_button" type="submit" onClick={e => {handleShow(); setApplyingDefault(true);}}><b>Reset to Default</b></Button>
-                            <Button variant="success" className="apply_button" type="submit" onClick={handleShow}><b>Apply</b></Button>
+                            <Button variant="danger" className="settings_button" type="submit" onClick={e => {setApplyingDefault(true);handleShow();}}><b>Reset to Default</b></Button>
+                            <Button variant="success" className="apply_button" type="submit" onClick={e => {setApplyingDefault(false);handleShow();}}><b>Apply</b></Button>
 
 
 
@@ -153,7 +153,7 @@ function Settings(props){
                                 <Button variant="secondary" onClick={handleClose}>
                                     Actually, nevermind
                                 </Button>
-                                <Button variant="warning" onClick={e => {handleClose();(applyingDefault ? props.setUserSettings(props.default) : props.setUserSettings(settingsJSON))}}>
+                                <Button variant="warning" onClick={e => {(applyingDefault ? props.setUserSettings(props.default) : props.setUserSettings(settingsJSON));handleClose();}}>
                                     Yes I'm sure
                                 </Button>
                                 </Modal.Footer>
