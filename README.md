@@ -1,9 +1,9 @@
-# ANGEL
+# ANGEL: Downloader and Converter Application
 
-**A**: Advanced   
+**A**: Application for     
 **N**: Node-based   
 **G**: Graphical and   
-**E**: Electronic noise   
+**E**: Electronic-noise   
 **L**: Localizer   
 
 YouTube Downloader for audio and video in Javascript
