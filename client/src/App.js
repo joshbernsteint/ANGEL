@@ -12,7 +12,7 @@ import AudioDownloader from './components/audio_downloader';
 import VideoDownloader from './components/video_downloader';
 import Converter from './components/converter';
 import Settings from './components/settings';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import {Spinner, Modal, Button } from 'react-bootstrap';
 import axios from 'axios';
 
@@ -22,21 +22,18 @@ import axios from 'axios';
 
 function App() {
 
-
-
-
-const defaultUserSettings = {
-    General:{
-      port: "6547",
-      show_download_popup: true,
-    },
-    Appearance:{
-      settings_window: "General",
-      is_dark_mode: false,
-      mode: {background: "white", color: "black"},
-      text_size: "Medium",
-    },
-  };
+  const defaultUserSettings = {
+      General:{
+        port: "6547",
+        show_download_popup: true,
+      },
+      Appearance:{
+        settings_window: "General",
+        is_dark_mode: false,
+        mode: {background: "white", color: "black"},
+        text_size: "Medium",
+      },
+    };
 
 
   const [port, setPort] = useState(6547);
@@ -55,7 +52,7 @@ const defaultUserSettings = {
     async function setSettings(){
         let settings_response = () => {
           return new Promise(function(resolve, reject){
-              axios.get(`http://localhost:${port}/apply_settings`,{ params: {settings: userSettings}}).then(
+              axios.get(`http://localhost:${port}/apply_settings`,{ params: {settings: {...userSettings,Appearance: {...userSettings.Appearance, settings_window: "General"}}}}).then(
                   response => resolve(response)
               );
           });
@@ -67,9 +64,7 @@ const defaultUserSettings = {
 
 
     if(changeCount > 0){
-      console.log('Changing...');
       setSettings();
-
     }
     setChangeCount(changeCount+1);
   

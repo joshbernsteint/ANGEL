@@ -85,7 +85,8 @@ app.get('/get_data', async (req,res) => {
                 video_options.add({quality: element.qualityLabel, itag: element.itag, fps: element.fps, video_type: element.container})
             }
           })
-        res.status(200).json({title: video_info.videoDetails.title,url: req.query.url, id: video_id,length_seconds: video_info.videoDetails.lengthSeconds,desc: video_info.videoDetails.description, video_options: [...video_options]})
+        res.status(200).json({title: video_info.videoDetails.title,url: req.query.url, id: video_id,
+            length_seconds: video_info.videoDetails.lengthSeconds,desc: video_info.videoDetails.description, video_options: [...video_options]});
     }
     catch(err){
         res.json({error: err.message})
