@@ -1,5 +1,5 @@
-import { Stack, Tabs, Tab, Container, Row, Col, Form, Button, Modal } from "react-bootstrap";
-import { useState } from 'react'
+import { Stack, Tabs, Tab, Container, Row, Col, Form, Button, Modal, FormCheck } from "react-bootstrap";
+import { useState, useEffect } from 'react'
 import "../App.css";
 
 function Settings(props){
@@ -42,17 +42,16 @@ function Settings(props){
                         </Col>
                         <Col>
                             <Form>
-                                <Form.Check type="switch" id="dark_mode" onChange={(e) => {
-                                    e.preventDefault()
-                                    if(e.target.checked){
-                                        setSettingsJSON({...settingsJSON, Appearance: {...settingsJSON.Appearance, mode: darkMode, is_dark_mode: true}});
+                                <FormCheck type="switch" id="dark_mode_switch" onChange={(e) => {
+                                    const isDark = !(settingsJSON.Appearance.is_dark_mode == true);
+                                    if(isDark){
+                                        setSettingsJSON({...settingsJSON, Appearance: {...settingsJSON.Appearance, is_dark_mode: !(settingsJSON.Appearance.is_dark_mode == true), mode: darkMode}});
                                     }
                                     else{
-                                        setSettingsJSON({...settingsJSON, Appearance: {...settingsJSON.Appearance, mode: lightMode, is_dark_mode: false}});
-
+                                        setSettingsJSON({...settingsJSON, Appearance: {...settingsJSON.Appearance, is_dark_mode: !(settingsJSON.Appearance.is_dark_mode == true), mode: lightMode}});
                                     }
                                 }}
-                                defaultChecked={settingsJSON.Appearance.is_dark_mode}
+                                checked={settingsJSON.Appearance.is_dark_mode == true}
                                 />
 
 
@@ -111,25 +110,6 @@ function Settings(props){
     const [applyingDefault, setApplyingDefault] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-    function handleSettingsSet(target){
-        
-        return (
-            <Modal show={show} onHide={handleClose} backdrop="static" animation={false}>
-                <Modal.Header>
-                <Modal.Title>Are you sure?</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>If you overwrite the settings, there is no way to undo without manually changing everything back.</Modal.Body>
-                <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose}>
-                    Actually, nevermind
-                </Button>
-                <Button variant="warning" onClick={e => props.setUserSettings(target)}>
-                    Yes I'm sure
-                </Button>
-                </Modal.Footer>
-            </Modal>
-        );
-    }
 
 
     return (
@@ -173,7 +153,7 @@ function Settings(props){
                                 <Button variant="secondary" onClick={handleClose}>
                                     Actually, nevermind
                                 </Button>
-                                <Button variant="warning" onClick={e => {(applyingDefault ? props.setUserSettings(props.default) : props.setUserSettings(settingsJSON))}}>
+                                <Button variant="warning" onClick={e => {handleClose();(applyingDefault ? props.setUserSettings(props.default) : props.setUserSettings(settingsJSON))}}>
                                     Yes I'm sure
                                 </Button>
                                 </Modal.Footer>

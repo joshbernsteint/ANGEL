@@ -96,7 +96,8 @@ DWORD maintainServer(LPVOID server_info){
     while(appOpen){
         WaitForSingleObject(info->server.hProcess, INFINITE);
         if((appOpen = isOpen(window_name))){
-            makeProcess(call,NULL,info->server_info,info->server);
+            int result = makeProcess(call,NULL,info->server_info,info->server);
+            printf("%d\n",result);
             printf("Restarting server...\n");
         }
     }
@@ -120,7 +121,6 @@ int _tmain()
 
     const char* app_c = "./electron-app.exe";
     const char* server_c = server_call_const;
-    // const char* server_a = "";
     bool windowOpened = true;
 
     char app_call[32];
@@ -131,6 +131,8 @@ int _tmain()
     fillArray(server_c,server_call,64);
     // fillArray(server_a,server_args,32);
 
+
+
     // Start the processes. 
     #ifdef RUN_PROCS
     printf("Starting Processes\n");
@@ -138,11 +140,12 @@ int _tmain()
     makeProcess(app_call,NULL,app_si,app_pi);
     printf("Processes Created\n");
 
-    // thread_handle = CreateThread(NULL,0,maintainServer,&thread_struct,0, NULL);
-    #endif
-
     thread_struct.server = server_pi;
     thread_struct.server_info = server_si;
+
+    thread_handle = CreateThread(NULL,0,maintainServer,&thread_struct,0, NULL);
+    #endif
+
     
     #ifdef RUN_PROCS
     // Wait until app process exits.
@@ -152,7 +155,7 @@ int _tmain()
     }
     printf("Server Terminating\n"); 
     TerminateProcess(server_pi.hProcess, 0);//Terminates the server that downloads the videos
-    // TerminateThread(thread_handle, 0);
+    TerminateThread(thread_handle, 0);
 
 
     // Close process and thread handles. 
@@ -160,7 +163,7 @@ int _tmain()
     CloseHandle( app_pi.hThread );
     CloseHandle( server_pi.hProcess );
     CloseHandle( server_pi.hThread );
-    // CloseHandle(thread_handle);
+    CloseHandle(thread_handle);
     #endif
 
 

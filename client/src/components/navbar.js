@@ -7,7 +7,7 @@ function MyNavbar(props){
     return (
         <Navbar className={styles.nav} fixed="top" expand='lg'>
             <Container fluid>
-                <Navbar.Brand to="/" className={styles.nav_brand}>
+                <Navbar.Brand to="/" className={styles.nav_brand} href="#">
                     <img
                     alt="brand icon"
                     src="./angel.png"
