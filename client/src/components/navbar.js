@@ -1,8 +1,41 @@
 import {Nav,Container, Navbar } from 'react-bootstrap'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import styles from "./navbar.module.css"
+import { useEffect, useState } from 'react';
 
 function MyNavbar(props){
+    const navigate = useNavigate();
+    const [navigator, setNavigator] = useState(0);
+    
+    useEffect(() =>{
+        if(navigator > 0 && navigator < 2){
+            console.log('Navigating to default page...');
+            switch (props.settings.General.default_page) {
+                case 'Home':
+                    navigate('/')
+                    break;
+                case 'Audio Downloader':
+                    navigate('/audio_downloader')
+                    break;
+                case 'Video Downloader':
+                    navigate('/video_downloader')
+                    break;
+                case 'Converter':
+                    navigate('/converter')
+                    break;
+                case 'Settings':
+                    navigate('/settings')
+                    break;
+                case 'None':
+                    console.log('nevermind!');
+                    break;
+                default:
+                    break;
+            }
+        }
+        setNavigator(navigator+1);
+        // console.log('navigating...');
+    },[props.settings.General]);
 
     return (
         <Navbar className={styles.nav} fixed="top" expand='lg'>

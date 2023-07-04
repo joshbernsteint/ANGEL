@@ -117,3 +117,7 @@
     border: .2rem solid;
     border-radius: 20px;
 }
+
+.top_bottom{
+    padding-bottom: 1rem;
+}

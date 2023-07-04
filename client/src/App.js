@@ -3,6 +3,7 @@ import {
   HashRouter as Router,
   Routes,
   Route,
+  useNavigate,
 } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css"
@@ -17,23 +18,45 @@ import {Spinner, Modal, Button } from 'react-bootstrap';
 import axios from 'axios';
 
 
+const defaultUserSettings = {
+  General:{
+    port: 6547,
+    custom_port: false,
+    show_download_popup: true,
+    default_page: "None",
+  },
+  Appearance:{
+    settings_window: "General",
+    is_dark_mode: false,
+    text_size: "Medium",
+  },
+};
 
+const lightMode = {background: "white", color: "black"};
+const darkMode = {background: "black", color: "white"};
+
+/**
+ * Parses a JSON object to be equivalent to a stylesheet
+ * @param {*JSON} settings 
+ * @returns A Parsed JSON object
+ */
+function parseSettings(settings){
+  var style = {
+  };
+    if(settings.Appearance.is_dark_mode == true){
+      style = {...style, background: "black", color: "white"};
+    }
+    else{
+      style = {...style, background: "white", color: "black"};
+    }
+
+    const font_size = `${settings.Appearance.text_size}`.toLowerCase();
+    style = {...style, fontSize: font_size}
+  return style
+}
 
 
 function App() {
-
-  const defaultUserSettings = {
-      General:{
-        port: "6547",
-        show_download_popup: true,
-      },
-      Appearance:{
-        settings_window: "General",
-        is_dark_mode: false,
-        mode: {background: "white", color: "black"},
-        text_size: "Medium",
-      },
-    };
 
 
   const [port, setPort] = useState(6547);
@@ -47,12 +70,13 @@ function App() {
   const Converter_Screen = () => {return (<Converter port={port} userSettings={userSettings}/>)};
   const Settings_Screen = () => {return (<Settings userSettings={userSettings} setUserSettings={setUserSettings} default={defaultUserSettings} />)};
 
+  const parsedSettings = parseSettings(userSettings);
 
   useEffect(() => {
     async function setSettings(){
         let settings_response = () => {
           return new Promise(function(resolve, reject){
-              axios.get(`http://localhost:${port}/apply_settings`,{ params: {settings: {...userSettings,Appearance: {...userSettings.Appearance, settings_window: "General"}}}}).then(
+              axios.get(`http://localhost:${port}/apply_settings`,{ params: {settings: userSettings}}).then(
                   response => resolve(response)
               );
           });
@@ -63,7 +87,7 @@ function App() {
     }
 
 
-    if(changeCount > 0){
+    if(changeCount > 1){
       setSettings();
     }
     setChangeCount(changeCount+1);
@@ -110,7 +134,7 @@ function App() {
       var curPort = port;
       var foundPort = false;
       
-      //TODO make this not suck
+      
       while(foundPort === false){
         await fetch(`http://localhost:${curPort}/test_connection`).then(res => {
         if(res.status === 200){
@@ -134,19 +158,20 @@ function App() {
             console.log('Catching server default settings failed, using set defaults');
           }
           else{
-            setUserSettings(obj);
+            setUserSettings({...obj,General: {...obj.General, custom_port: (obj.General.custom_port == "true")}, Appearance: {...obj.Appearance, is_dark_mode: (obj.Appearance.is_dark_mode == "true")}});
           }
+          
+
         });
     }
      wrapper();
   }, []);
 
 
-
   return (
       <Router>
-      <div className='main' style={userSettings.Appearance.mode}>
-      <MyNavbar/>
+      <div className='main' style={parsedSettings}>
+      <MyNavbar settings={userSettings}/>
         <Routes>
           <Route path="/" exact Component={ Home_Screen }/>
           <Route exact path="/audio_downloader" Component={ Audio_Screen }/>
