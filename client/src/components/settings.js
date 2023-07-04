@@ -20,7 +20,7 @@ function Settings(props){
     const [settingsJSON, setSettingsJSON] = useState(props.userSettings);
     const [usingPort, setUsingPort] = useState(props.userSettings.General.custom_port);
     const [customPort, setCustomPort] = useState(props.userSettings.General.port);
-    
+
     function General(){
         return (
             <div>

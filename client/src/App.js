@@ -152,7 +152,7 @@ function App() {
 
     async function wrapper(){
         await findPort();
-        fetch(`http://localhost:${port}/get_settings`).then(res => {return res.json()}).then(obj => {
+        await fetch(`http://localhost:${port}/get_settings`).then(res => {return res.json()}).then(obj => {
           if('error' in obj){
             setUserSettings(defaultUserSettings)
             console.log('Catching server default settings failed, using set defaults');
