@@ -1,12 +1,18 @@
-import { Stack, Tabs, Tab, Container, Row, Col, Form, Button, Modal, FormCheck } from "react-bootstrap";
+import { Stack, Tabs, Tab, Container, Row, Col, Form, Button, Modal, FormCheck, Alert } from "react-bootstrap";
 import { useState, useEffect, useRef } from 'react'
 import "../App.css";
 
+const all_menus = ['General', 'Appearance', 'Downloader','Converter'];
+const text_sizes = ['X-large','Large','Medium','Small'];
+const pages = ['Home','Audio Downloader', 'Video Downloader','Converter','Settings', 'None'];
+
+
+function isValidPort(num){
+    return (0 <= num && num <= 65535)
+}
+
 function Settings(props){
 
-    const all_menus = ['General', 'Appearance', 'Downloader','Converter'];
-    const text_sizes = ['X-large','Large','Medium','Small'];
-    const pages = ['Home','Audio Downloader', 'Video Downloader','Converter','Settings', 'None'];
     
     function SubHeader(props){
         return (
@@ -20,6 +26,7 @@ function Settings(props){
     const [settingsJSON, setSettingsJSON] = useState(props.userSettings);
     const [usingPort, setUsingPort] = useState(props.userSettings.General.custom_port);
     const [customPort, setCustomPort] = useState(props.userSettings.General.port);
+    const [showPortError, setShowPortError] = useState(!isValidPort(customPort));
 
     function General(){
         return (
@@ -65,14 +72,20 @@ function Settings(props){
                                 <Form.Check type="checkbox" label="" id="custom_port_switch" onChange={e => {
                                     setUsingPort(e.target.checked)
                                     if(!e.target.checked){
-                                        setCustomPort(props.userSettings.General.port)
+                                        setCustomPort(props.default.General.port)
                                     }
                                 }} checked={usingPort}/>
                                 <Form.Control type="number" disabled={!usingPort} autoFocus value={customPort} onChange={e => {
+                                    if(isValidPort(e.target.value)){
+                                        console.log('valid');
+                                    }
+                                    else{
+                                        console.log('Invalid port number being blocked');
+                                    }
                                     setCustomPort(e.target.value)
                                 }}
-                                isInvalid={customPort < 0 || customPort > 65535}
-                                isValid={0 <= customPort && customPort <= 65535}
+                                isInvalid={!isValidPort(customPort)}
+                                isValid={isValidPort(customPort)}
                                 />
                             </Form>
                         </Col>
@@ -168,8 +181,7 @@ function Settings(props){
     const handleShow = () => setShow(true);
 
     function handleSubmit(){
-        console.log('hgereer');
-        (applyingDefault ? props.setUserSettings(props.default) : props.setUserSettings({...settingsJSON,General: {...settingsJSON.General,custom_port: usingPort},Appearance: {...settingsJSON.Appearance, settings_window: "General"}}));
+        (applyingDefault ? props.setUserSettings(props.default) : props.setUserSettings({...settingsJSON,General: {...settingsJSON.General,custom_port: usingPort, port: customPort},Appearance: {...settingsJSON.Appearance, settings_window: "General"}}));
         handleClose();
     }
 
@@ -194,11 +206,37 @@ function Settings(props){
                 </Stack>
                 <Stack className="settings_options">
                     <h1 className="center_title" style={{borderColor: (props.userSettings.Appearance.is_dark_mode ? "white" : "black")}}>{settingsJSON.Appearance.settings_window}</h1>
+                    {/* Alert message if a setting is made incorrectly */}
+                    {showPortError ? (
+                                <Alert dismissible variant="danger" style={{width: "50%"}} onClose={e => setShowPortError(false)}>
+                                    <Alert.Heading>Custom port error</Alert.Heading>
+                                    Please input a valid port number between 0 and 65,535
+                                    <hr/>
+                                    <div className="d-flex justify-content-end">
+                                        <Button onClick={() => {setUsingPort(false);setCustomPort(props.default.General.port);setShowPortError(false)}} variant="outline-success" style={{marginRight: "1rem"}}>
+                                            Reset to default Port #
+                                        </Button>
+                                        <Button onClick={() => setShowPortError(false)} variant="outline-danger">
+                                            I understand
+                                        </Button>
+                                    </div>
+                                </Alert>
+                            ): <></>}
                     {displaySettings()}
                     <div className="apply_button">
                         <Stack direction="horizontal" gap={2}>
                             <Button variant="danger" className="settings_button" type="submit" onClick={e => {setApplyingDefault(true);handleShow();}}><b>Reset to Default</b></Button>
-                            <Button variant="success" className="apply_button" type="submit" onClick={e => {setApplyingDefault(false);handleShow();}}><b>Apply</b></Button>
+                            <Button variant="success" className="apply_button" type="submit" onClick={e => {
+                                setApplyingDefault(false);
+                                if(isValidPort(customPort)){
+                                    setShowPortError(false);
+                                    handleShow();
+                                }
+                                else{
+                                    setShowPortError(true);
+                                    console.log('Input valid port #');
+                                }
+                            }}><b>Apply</b></Button>
 
 
 
@@ -219,7 +257,7 @@ function Settings(props){
                                 </Button>
                                 </Modal.Footer>
                             </Modal>
-                            
+                        
                             
                         </Stack>
                     </div>
