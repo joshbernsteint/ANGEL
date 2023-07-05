@@ -18,6 +18,23 @@ const settings_path = './userSettings.json';
 const ffmpeg_path = "ffmpeg/ffmpeg.exe";
 var port = 6547;//Default value for port is 6547
 
+if(fs.existsSync(settings_path)){
+    const fileData = fs.readFileSync(settings_path);
+    const settings = JSON.parse(fileData);
+    if(Object.keys(fileData).length){
+        port = Number(settings.General.port);
+    }
+    else{
+        console.log('Sending Error');
+        port = 6547;
+    }
+}
+else{
+    port = 6547;
+}
+
+
+
 app.get('/', (req,res) => {
     res.send('Nothing to see here folks')
 });

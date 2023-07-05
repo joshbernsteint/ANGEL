@@ -87,7 +87,7 @@ function App() {
     }
 
 
-    if(changeCount > 1){
+    if(changeCount > 0){
       setSettings();
     }
     setChangeCount(changeCount+1);
@@ -130,35 +130,45 @@ function App() {
 
   // Finds the server port for downloading images
   useEffect(()=>{
+    const localPort = JSON.parse(localStorage.getItem('port'));
+    var curPort = localPort;
+    var foundPort = false;
+
     async function findPort(){
-      var curPort = port;
-      var foundPort = false;
+
       
-      
+
       while(foundPort === false){
         await fetch(`http://localhost:${curPort}/test_connection`).then(res => {
-        if(res.status === 200){
-          foundPort = true;
-          console.log(`Port ${curPort} made a successful connection`);
-          setPort(curPort);
-          setShow(false);
-        }}
-        ).catch(
-          rejected => {
-            console.log(`Port ${curPort} was not correct, trying next port now...`);
-            curPort++;});
+          if(res.status === 200){
+            console.log(`Port ${curPort} made a successful connection`);
+            setPort(curPort);
+            setShow(false);
+            if(curPort != localPort){
+              setUserSettings({...userSettings,General: {...userSettings.General, port: curPort}});
+              localStorage.setItem('port',JSON.stringify(curPort));
+            }
+            foundPort = true;
+          }}
+          ).catch(
+            rejected => {
+              console.log(`Port ${curPort} was not correct, trying next port now...`);
+              curPort++;
+              });
       }
     }
+      
+    
 
     async function wrapper(){
         await findPort();
-        await fetch(`http://localhost:${port}/get_settings`).then(res => {return res.json()}).then(obj => {
+        await fetch(`http://localhost:${curPort}/get_settings`).then(res => {return res.json()}).then(obj => {
           if('error' in obj){
             setUserSettings(defaultUserSettings)
             console.log('Catching server default settings failed, using set defaults');
           }
           else{
-            setUserSettings({...obj,General: {...obj.General, custom_port: (obj.General.custom_port == "true")}, Appearance: {...obj.Appearance, is_dark_mode: (obj.Appearance.is_dark_mode == "true")}});
+            setUserSettings({...obj,General: {...obj.General, custom_port: (obj.General.custom_port == "true"), port: curPort}, Appearance: {...obj.Appearance, is_dark_mode: (obj.Appearance.is_dark_mode == "true")}});
           }
           
 

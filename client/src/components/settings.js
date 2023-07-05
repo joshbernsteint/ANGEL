@@ -181,7 +181,14 @@ function Settings(props){
     const handleShow = () => setShow(true);
 
     function handleSubmit(){
-        (applyingDefault ? props.setUserSettings(props.default) : props.setUserSettings({...settingsJSON,General: {...settingsJSON.General,custom_port: usingPort, port: customPort},Appearance: {...settingsJSON.Appearance, settings_window: "General"}}));
+        if(applyingDefault){
+            props.setUserSettings(props.default)
+            localStorage.setItem('port',JSON.stringify(6547));
+        }
+        else{
+            props.setUserSettings({...settingsJSON,General: {...settingsJSON.General,custom_port: usingPort, port: customPort},Appearance: {...settingsJSON.Appearance, settings_window: "General"}})
+            localStorage.setItem('port',JSON.stringify(customPort));
+        }
         handleClose();
     }
 
