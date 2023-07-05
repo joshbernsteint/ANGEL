@@ -22,13 +22,18 @@ const defaultUserSettings = {
   General:{
     port: 6547,
     custom_port: false,
-    show_download_popup: true,
     default_page: "None",
   },
   Appearance:{
     settings_window: "General",
     is_dark_mode: false,
     text_size: "Medium",
+  },
+  Downloads:{
+    show_popup: true,
+  },
+  Converter:{
+    show_popup: true,
   },
 };
 
