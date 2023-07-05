@@ -1,1 +1,1 @@
-g++ win_setup.cpp -o setup
+g++ ../setup/win_setup.cpp -o setup

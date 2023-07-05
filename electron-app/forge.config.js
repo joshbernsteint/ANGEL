@@ -44,7 +44,7 @@ module.exports = {
       fs.cpSync(path.join(__dirname,'../server/server.exe'),path.join(__dirname,'/out/electron-app-win32-x64/server.exe'), {recursive: true});//Node server
       fs.cpSync(path.join(__dirname,'../server/userSettings.json'),path.join(__dirname,'/out/electron-app-win32-x64/userSettings.json'), {recursive: true});//JSON file containing user settings
       fs.cpSync(path.join(__dirname,'../server/node_modules/ffmpeg-static/'),path.join(__dirname,'/out/electron-app-win32-x64/ffmpeg/'), {recursive: true});//Executable needed by the node server
-      fs.cpSync(path.join(__dirname,'../win_setup.exe'),path.join(__dirname,'/out/electron-app-win32-x64/win_setup.exe'), {recursive: true});
+      fs.cpSync(path.join(__dirname,'../setup/win_setup.exe'),path.join(__dirname,'/out/electron-app-win32-x64/win_setup.exe'), {recursive: true});
     }
   }
 };
