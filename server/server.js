@@ -1,38 +1,61 @@
+/**
+ * Joshua Bernstein
+ * server.js
+ */
 const path = require('path');
 const fs = require('fs');
 const cp = require('child_process');
 const os = require('os');
 
-const curUser = os.userInfo().username;
-
 const express = require('express');
 const ytdl = require('ytdl-core');
 const ffmpeg = require('ffmpeg-static');
-const cors = require('cors')
+const cors = require('cors');
+const { log } = require('console');
 
-
+const curUser = os.userInfo().username;
 const app = express();
-
-var downloadPath = "";
+const default_port = 6547;
+const base_download_path = "Results/"
 const settings_path = './userSettings.json';
 const ffmpeg_path = "ffmpeg/ffmpeg.exe";
+
 var port = 6547;//Default value for port is 6547
+var server_settings = {};
 
 if(fs.existsSync(settings_path)){
     const fileData = fs.readFileSync(settings_path);
     const settings = JSON.parse(fileData);
     if(Object.keys(fileData).length){
         port = Number(settings.General.port);
-    }
-    else{
-        console.log('Sending Error');
-        port = 6547;
+        server_settings = {
+            port: port,
+            audio: {
+                download_type: settings.Downloads.audio.download_type,
+                download_path: settings.Downloads.audio.download_path
+            },
+            video:{
+                download_type: settings.Downloads.video.download_type,
+                download_path: settings.Downloads.video.download_path
+            }
+        };
     }
 }
 else{
-    port = 6547;
+    server_settings = {
+        port: default_port,
+        audio: {
+            download_type: "prompt",
+            download_path: base_download_path
+        },
+        video:{
+            download_type: "prompt",
+            download_path: base_download_path
+        }
+    };
 }
 
+console.log(server_settings);
 
 
 app.get('/', (req,res) => {
@@ -112,6 +135,7 @@ app.get('/get_data', async (req,res) => {
 
 //For downloading a video
 app.get('/video/:id/:itag/:name/:format/:audio', async (req,res) => {
+    const fileName = (server_settings.video.download_type === "prompt") ? `${req.params.name}.${req.params.format}` : `${server_settings.video.download_path}/${req.params.name}.${req.params.format}`
     const audio = (req.params.audio === "High") ?  ytdl(req.params.id, { quality: 'highestaudio' }): ytdl(req.params.id, { quality: 'lowestaudio' })
     const video = ytdl(req.params.id, { quality: req.params.itag });
     const ffmpegProcess = cp.spawn(ffmpeg_path, [
@@ -128,7 +152,7 @@ app.get('/video/:id/:itag/:name/:format/:audio', async (req,res) => {
         // Keep encoding
         '-c:v', 'copy',
         // Define output file
-        `${req.params.name}.${req.params.format}`,
+        `${fileName}`,
       ], {
         windowsHide: true,
         stdio: [
@@ -140,25 +164,29 @@ app.get('/video/:id/:itag/:name/:format/:audio', async (req,res) => {
       });
     audio.pipe(ffmpegProcess.stdio[4]);
     video.pipe(ffmpegProcess.stdio[5]);
+    ffmpegProcess.on('start',() => {
+        console.log(`Started downloading video file ${fileName}`)
+    })
     ffmpegProcess.on('close', async () => {
         // console.log(`Done downloading video ID ${req.params.id}`)
-        res.download(path.resolve(`./${req.params.name}.${req.params.format}`), (err) => {
-            if(err){
-                // console.log(err)
-            }
-            else{
-                // console.log(`Deleting File ${req.params.id}`)
-                // fs.unlinkSync(path.resolve( `./${req.params.name}.${req.params.format}`));
-
-            }
-        })
+        if(server_settings.video.download_type === "prompt"){
+            res.download(path.resolve(fileName), (err) => {
+                if(err){
+                    console.log(err)
+                }
+                else{
+                    fs.unlinkSync(path.resolve(fileName));
+                }
+            });
+        }
     })
 });
+
 
 //For downloading audio
 app.get('/audio/:id/:qual/:name/:format', async (req,res) => {
     const audio = (req.params.qual === "High") ?  ytdl(req.params.id, { quality: 'highestaudio' }): ytdl(req.params.id, { quality: 'lowestaudio' })
-    const fileName = `${req.params.name}.${req.params.format}`
+    const fileName = (server_settings.audio.download_type === "prompt") ? `${req.params.name}.${req.params.format}` : `${server_settings.audio.download_path}/${req.params.name}.${req.params.format}`
 
 
     const ffmpegProcess = cp.spawn(ffmpeg_path, [
@@ -185,20 +213,21 @@ app.get('/audio/:id/:qual/:name/:format', async (req,res) => {
       });
     audio.pipe(ffmpegProcess.stdio[4]);
     ffmpegProcess.on('start',() => {
-        // console.log(`Started downloading audio ID ${req.params.id}`)
+        console.log(`Started downloading audio file ${fileName}`)
     })
     ffmpegProcess.on('close', async () => {
         // console.log(`Done downloading audio ID ${req.params.id}`)
-        res.download(path.resolve(`./${fileName}`), (err) => {
-            if(err){
-                // console.log(err)
-            }
-            else{
-                // console.log(`Deleting File ${fileName}`)
-                // fs.unlinkSync(path.resolve(`./${fileName}`));
-
-            }
-        })
+        if(server_settings.audio.download_type === "prompt"){
+            res.download(path.resolve(fileName), (err) => {
+                if(err){
+                    console.log(err)
+                }
+                else{
+                    fs.unlinkSync(path.resolve(fileName));
+                }
+            });
+        }
+       
         // fs.copyFileSync(path.resolve(`./${fileName}`),path.resolve(`C:/Users/${curUser}/Music/${fileName}`));
         // fs.unlinkSync(path.resolve(`./${fileName}`));
         res.status(200).send("All good!");

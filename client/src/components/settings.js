@@ -183,7 +183,7 @@ function Settings(props){
     function handleSubmit(){
         if(applyingDefault){
             props.setUserSettings(props.default)
-            localStorage.setItem('port',JSON.stringify(6547));
+            localStorage.setItem('port',JSON.stringify(props.default.General.port));
         }
         else{
             props.setUserSettings({...settingsJSON,General: {...settingsJSON.General,custom_port: usingPort, port: customPort},Appearance: {...settingsJSON.Appearance, settings_window: "General"}})

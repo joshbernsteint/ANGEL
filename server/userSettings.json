@@ -1,1 +1,1 @@
-{"General":{"port":"6547","custom_port":"false","show_download_popup":"true","default_page":"None"},"Appearance":{"settings_window":"General","is_dark_mode":"true","text_size":"Medium"}}
+{"General":{"port":"6547","custom_port":"false","default_page":"None"},"Appearance":{"settings_window":"General","is_dark_mode":"false","text_size":"Medium"},"Downloads":{"show_popup":"true","audio":{"download_type":"prompt","download_path":"./Results/"},"video":{"download_type":"prompt","download_path":"./Results/"}},"Converter":{"show_popup":"true"}}
