@@ -179,6 +179,9 @@ app.get('/video/:id/:itag/:name/:format/:audio', async (req,res) => {
                 }
             });
         }
+        else{
+            res.status(200).send("All good!");
+        }
     })
 });
 
@@ -218,19 +221,24 @@ app.get('/audio/:id/:qual/:name/:format', async (req,res) => {
     ffmpegProcess.on('close', async () => {
         // console.log(`Done downloading audio ID ${req.params.id}`)
         if(server_settings.audio.download_type === "prompt"){
-            res.download(path.resolve(fileName), (err) => {
+            console.log('prompting...');
+            res.download(`./${fileName}`, (err) => {
                 if(err){
-                    console.log(err)
+                    console.log(err);
+                    res.end();
                 }
                 else{
                     fs.unlinkSync(path.resolve(fileName));
                 }
             });
+
+        }
+        else{
+            res.status(200).send("All good!");
         }
        
         // fs.copyFileSync(path.resolve(`./${fileName}`),path.resolve(`C:/Users/${curUser}/Music/${fileName}`));
         // fs.unlinkSync(path.resolve(`./${fileName}`));
-        res.status(200).send("All good!");
     })
 });
 

@@ -188,6 +188,7 @@ function App() {
         });
     }
      wrapper();
+     console.log(userSettings);
   }, []);
 
 

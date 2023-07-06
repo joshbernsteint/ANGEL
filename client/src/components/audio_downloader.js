@@ -40,15 +40,22 @@ function AudioDownloader(props){
 
     async function downloadAudio(){
         setFileName(`${nameRef.current.value}.${audioType}`)
-        fetch(`http://localhost:${props.port}/audio/${audioData.id}/${audioQuality}/${nameRef.current.value}/${audioType}`).then(res => {
-            if(res.status==200){
-                console.log(`${fileName} downloaded.`);
-                setNotification(true);
-            }
-            else{
-                console.log('ERROR IN AUDIO DOWNLOAD');
-            }
-        })
+        if(props.userSettings.Downloads.audio.download_type === "prompt"){
+            window.location.assign(`http://localhost:${props.port}/audio/${audioData.id}/${audioQuality}/${nameRef.current.value}/${audioType}`);
+            console.log(`${fileName} downloaded.`);
+            setNotification(true);
+        }
+        else{
+            fetch(`http://localhost:${props.port}/audio/${audioData.id}/${audioQuality}/${nameRef.current.value}/${audioType}`).then(res => {
+                if(Number(res.status)===200){
+                    console.log(`${fileName} downloaded.`);
+                    setNotification(true);
+                }
+                else{
+                    console.log('ERROR IN AUDIO DOWNLOAD');
+                }
+            })
+        }
     }
 
     async function getData(e){

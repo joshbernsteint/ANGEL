@@ -34,7 +34,15 @@ function VideoDownloader(props){
 
     async function downloadVideo(){
         setFileName(`${nameRef.current.value}.${videoType}`)
-        fetch(`http://localhost:${props.port}/video/${videoData.id}/${itag}/${nameRef.current.value}/${videoType}/${audioQuality}`).then(res => {
+
+
+        if(props.userSettings.Downloads.audio.download_type === "prompt"){
+            window.location.assign(`http://localhost:${props.port}/video/${videoData.id}/${itag}/${nameRef.current.value}/${videoType}/${audioQuality}`);
+            console.log(`${fileName} downloaded.`);
+            setNotification(true);
+        }
+        else{
+            fetch(`http://localhost:${props.port}/video/${videoData.id}/${itag}/${nameRef.current.value}/${videoType}/${audioQuality}`).then(res => {
             if(res.status===200){
                 console.log(`Video ${fileName} downloaded!`);
                 setNotification(true);
@@ -42,7 +50,9 @@ function VideoDownloader(props){
             else{
                 console.log('ERROR IN Video DOWNLOAD');
             }
-        })
+            })
+        }
+        
     }
 
     async function getVideoData(e){
