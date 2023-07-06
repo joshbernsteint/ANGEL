@@ -2,17 +2,18 @@
  * Joshua Bernstein
  * server.js
  */
+
+//Imported libraries or functions
 const path = require('path');
 const fs = require('fs');
 const cp = require('child_process');
 const os = require('os');
-
 const express = require('express');
 const ytdl = require('ytdl-core');
 const ffmpeg = require('ffmpeg-static');
 const cors = require('cors');
-const { log } = require('console');
 
+//Unchanging constants
 const curUser = os.userInfo().username;
 const app = express();
 const default_port = 6547;
@@ -20,9 +21,12 @@ const base_download_path = "Results/"
 const settings_path = './userSettings.json';
 const ffmpeg_path = "ffmpeg/ffmpeg.exe";
 
+
+//Variable fields
 var port = 6547;//Default value for port is 6547
 var server_settings = {};
 
+//Sets the server_settings JSON from the file, using the default values otherwise
 if(fs.existsSync(settings_path)){
     const fileData = fs.readFileSync(settings_path);
     const settings = JSON.parse(fileData);
@@ -55,25 +59,38 @@ else{
     };
 }
 
-console.log(server_settings);
-
 
 app.get('/', (req,res) => {
     res.send('Nothing to see here folks')
 });
-app.use(cors())//Fixes error
+app.use(cors())//Fixes error, idk what the error was, but this fixes it
 
+//Used to test connection to the server
 app.get('/test_connection', (req,res) => {
     res.send('Connection successful!');
 });
 
+//Used to save config settings from the client
 app.get('/apply_settings', (req,res) => {
     const string_data = JSON.stringify(req.query.settings)
     fs.writeFileSync(settings_path,string_data);
+    server_settings = {
+        ...server_settings,
+        audio: {
+            download_type: req.query.settings.Downloads.audio.download_type,
+            download_path: req.query.settings.Downloads.audio.download_path
+        },
+        video:{
+            download_type: req.query.settings.Downloads.video.download_type,
+            download_path: req.query.settings.Downloads.video.download_path
+        }
+    };
     console.log('Changing settings');
     res.send('Settings changed!');
 });
 
+
+//Used for the client to recieve the config settings from the file
 app.get('/get_settings', (req,res) => {
     if(fs.existsSync(settings_path)){
         const data = fs.readFileSync(settings_path);
@@ -236,9 +253,6 @@ app.get('/audio/:id/:qual/:name/:format', async (req,res) => {
         else{
             res.status(200).send("All good!");
         }
-       
-        // fs.copyFileSync(path.resolve(`./${fileName}`),path.resolve(`C:/Users/${curUser}/Music/${fileName}`));
-        // fs.unlinkSync(path.resolve(`./${fileName}`));
     })
 });
 
@@ -265,9 +279,3 @@ async function findPort(){
 
 findPort();
 console.log("Current Username: "+curUser);
-
-
-
-
-
-
