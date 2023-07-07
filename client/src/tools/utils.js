@@ -12,3 +12,7 @@ export function convertTime(length_seconds){
 
     return `${padZero(hours)}:${padZero(minutes)}:${padZero(length_seconds)}`
 }
+
+export function isValidPort(num){
+    return (0 <= num && num <= 65535)
+}

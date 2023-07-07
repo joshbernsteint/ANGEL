@@ -1,5 +1,7 @@
-import { Stack, Tabs, Tab, Container, Row, Col, Form, Button, Modal, FormCheck, Alert } from "react-bootstrap";
+import { Stack, Tabs, Tab, Container, Row, Col, Form, Button, Modal, FormCheck, Alert,
+ButtonGroup, ToggleButton } from "react-bootstrap";
 import { useState, useEffect, useRef } from 'react'
+import { isValidPort } from "../tools/utils";
 import "../App.css";
 
 const all_menus = ['General', 'Appearance', 'Downloader','Converter'];
@@ -7,9 +9,7 @@ const text_sizes = ['X-large','Large','Medium','Small'];
 const pages = ['Home','Audio Downloader', 'Video Downloader','Converter','Settings', 'None'];
 
 
-function isValidPort(num){
-    return (0 <= num && num <= 65535)
-}
+
 
 function Settings(props){
 
@@ -24,6 +24,7 @@ function Settings(props){
     }
 
     const [settingsJSON, setSettingsJSON] = useState(props.userSettings);
+    const [downloadSwitch, setDownloadSwitch] = useState([(props.userSettings.Downloads.audio.download_type === "prompt" ? "1": "2"),(props.userSettings.Downloads.video.download_type === "prompt" ? "1": "2")]);
     const [usingPort, setUsingPort] = useState(props.userSettings.General.custom_port);
     const [customPort, setCustomPort] = useState(props.userSettings.General.port);
     const [showPortError, setShowPortError] = useState(!isValidPort(customPort));
@@ -142,9 +143,53 @@ function Settings(props){
     }
 
     function DownloadOptions(){
+        console.log(downloadSwitch);
+    
         return (
             <div>
                 <SubHeader title="Audio"/>
+                <Container fluid style={{width: "100%"}}>
+                    <Row>
+                        <Col xs={3}>
+                            <h5>Download Location</h5>
+                        </Col>
+                        <Col>
+                            <ButtonGroup>
+                                    <ToggleButton
+                                    type="radio"
+                                    key={1}
+                                    id = "test1"
+                                    variant="outline-primary"
+                                    name="radio"
+                                    value="1"
+                                    checked={downloadSwitch[0] === "1"}
+                                    onChange={(e) => setDownloadSwitch([e.currentTarget.value,downloadSwitch[1]])}
+                                >
+                                    Prompt me
+                                </ToggleButton>
+                                    <ToggleButton
+                                    type="radio"
+                                    key={2}
+                                    id="test2"
+                                    variant="outline-info"
+                                    name="radio"
+                                    value="2"
+                                    checked={downloadSwitch[0] === "2"}
+                                    onChange={(e) => setDownloadSwitch([e.currentTarget.value,downloadSwitch[1]])}
+                                >
+                                    Set Path
+                                </ToggleButton>
+                            </ButtonGroup>
+                            <Stack hidden={downloadSwitch[0] === "1"} direction="horizontal" style={{ paddingTop: "1rem"}} gap={2}>
+                                <Form style={{width: "35%"}}>
+                                    <Form.Control type="text" placeholder="Please enter a file path" defaultValue={props.userSettings.Downloads.audio.download_path} onChange={e => console.log(e.target.value)}>
+                                    </Form.Control>
+                                </Form>
+                                <Button type="submit" variant="warning">Check path</Button>
+                            </Stack>
+                        </Col>
+                    </Row>
+                </Container>
                 <SubHeader title="Video"/>
             </div>
         );

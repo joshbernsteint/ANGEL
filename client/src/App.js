@@ -33,11 +33,11 @@ const defaultUserSettings = {
     show_popup: true,
     audio:{
       download_type: "prompt",
-      download_path: "Results/",
+      download_path: "",
     },
     video:{
       download_type: "prompt",
-      download_path: "Results/",
+      download_path: "",
     }
   },
   Converter:{

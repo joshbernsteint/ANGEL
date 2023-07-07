@@ -58,6 +58,7 @@ else{
         }
     };
 }
+console.log(server_settings);
 
 
 app.get('/', (req,res) => {
@@ -68,6 +69,17 @@ app.use(cors())//Fixes error, idk what the error was, but this fixes it
 //Used to test connection to the server
 app.get('/test_connection', (req,res) => {
     res.send('Connection successful!');
+});
+
+
+//Checks to see if the file path given by req.query.path exists
+app.get('/is_valid_path', (req,res) => {
+    if(fs.existsSync(path.resolve(req.query.path))){
+        res.send(true);
+    }
+    else{
+        res.send(false);
+    }
 });
 
 //Used to save config settings from the client
