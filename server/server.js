@@ -17,7 +17,7 @@ const cors = require('cors');
 const curUser = os.userInfo().username;
 const app = express();
 const default_port = 6547;
-const base_download_path = "Results/"
+const base_download_path = ""
 const settings_path = './userSettings.json';
 const ffmpeg_path = "ffmpeg/ffmpeg.exe";
 
@@ -34,28 +34,16 @@ if(fs.existsSync(settings_path)){
         port = Number(settings.General.port);
         server_settings = {
             port: port,
-            audio: {
-                download_type: settings.Downloads.audio.download_type,
-                download_path: settings.Downloads.audio.download_path
-            },
-            video:{
-                download_type: settings.Downloads.video.download_type,
-                download_path: settings.Downloads.video.download_path
-            }
+            download_type: settings.Downloads.download_type,
+            download_path: settings.Downloads.download_path
         };
     }
 }
 else{
     server_settings = {
         port: default_port,
-        audio: {
-            download_type: "prompt",
-            download_path: base_download_path
-        },
-        video:{
-            download_type: "prompt",
-            download_path: base_download_path
-        }
+        download_type: "prompt",
+        download_path: base_download_path,
     };
 }
 console.log(server_settings);
@@ -88,14 +76,8 @@ app.get('/apply_settings', (req,res) => {
     fs.writeFileSync(settings_path,string_data);
     server_settings = {
         ...server_settings,
-        audio: {
-            download_type: req.query.settings.Downloads.audio.download_type,
-            download_path: req.query.settings.Downloads.audio.download_path
-        },
-        video:{
-            download_type: req.query.settings.Downloads.video.download_type,
-            download_path: req.query.settings.Downloads.video.download_path
-        }
+        download_type: req.query.settings.Downloads.download_type,
+        download_path: req.query.settings.Downloads.download_path,
     };
     console.log('Changing settings');
     res.send('Settings changed!');
@@ -164,7 +146,7 @@ app.get('/get_data', async (req,res) => {
 
 //For downloading a video
 app.get('/video/:id/:itag/:name/:format/:audio', async (req,res) => {
-    const fileName = (server_settings.video.download_type === "prompt") ? `${req.params.name}.${req.params.format}` : `${server_settings.video.download_path}/${req.params.name}.${req.params.format}`
+    const fileName = (server_settings.download_type === "prompt") ? `${req.params.name}.${req.params.format}` : `${server_settings.download_path}/${req.params.name}.${req.params.format}`
     const audio = (req.params.audio === "High") ?  ytdl(req.params.id, { quality: 'highestaudio' }): ytdl(req.params.id, { quality: 'lowestaudio' })
     const video = ytdl(req.params.id, { quality: req.params.itag });
     const ffmpegProcess = cp.spawn(ffmpeg_path, [
@@ -198,7 +180,7 @@ app.get('/video/:id/:itag/:name/:format/:audio', async (req,res) => {
     })
     ffmpegProcess.on('close', async () => {
         // console.log(`Done downloading video ID ${req.params.id}`)
-        if(server_settings.video.download_type === "prompt"){
+        if(server_settings.download_type === "prompt"){
             res.download(path.resolve(fileName), (err) => {
                 if(err){
                     console.log(err)
@@ -218,7 +200,7 @@ app.get('/video/:id/:itag/:name/:format/:audio', async (req,res) => {
 //For downloading audio
 app.get('/audio/:id/:qual/:name/:format', async (req,res) => {
     const audio = (req.params.qual === "High") ?  ytdl(req.params.id, { quality: 'highestaudio' }): ytdl(req.params.id, { quality: 'lowestaudio' })
-    const fileName = (server_settings.audio.download_type === "prompt") ? `${req.params.name}.${req.params.format}` : `${server_settings.audio.download_path}/${req.params.name}.${req.params.format}`
+    const fileName = (server_settings.download_type === "prompt") ? `${req.params.name}.${req.params.format}` : `${server_settings.download_path}/${req.params.name}.${req.params.format}`
 
 
     const ffmpegProcess = cp.spawn(ffmpeg_path, [
@@ -249,7 +231,7 @@ app.get('/audio/:id/:qual/:name/:format', async (req,res) => {
     })
     ffmpegProcess.on('close', async () => {
         // console.log(`Done downloading audio ID ${req.params.id}`)
-        if(server_settings.audio.download_type === "prompt"){
+        if(server_settings.download_type === "prompt"){
             console.log('prompting...');
             res.download(`./${fileName}`, (err) => {
                 if(err){

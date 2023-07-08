@@ -2,6 +2,7 @@ import { Stack, Tabs, Tab, Container, Row, Col, Form, Button, Modal, FormCheck, 
 ButtonGroup, ToggleButton } from "react-bootstrap";
 import { useState, useEffect, useRef } from 'react'
 import { isValidPort } from "../tools/utils";
+import axios from 'axios'
 import "../App.css";
 
 const all_menus = ['General', 'Appearance', 'Downloader','Converter'];
@@ -24,10 +25,23 @@ function Settings(props){
     }
 
     const [settingsJSON, setSettingsJSON] = useState(props.userSettings);
-    const [downloadSwitch, setDownloadSwitch] = useState([(props.userSettings.Downloads.audio.download_type === "prompt" ? "1": "2"),(props.userSettings.Downloads.video.download_type === "prompt" ? "1": "2")]);
     const [usingPort, setUsingPort] = useState(props.userSettings.General.custom_port);
     const [customPort, setCustomPort] = useState(props.userSettings.General.port);
     const [showPortError, setShowPortError] = useState(!isValidPort(customPort));
+    const [pathChecked, setPathChecked] = useState(true);
+
+
+    async function checkPath(){
+        let path_response = () => {
+            return new Promise(function(resolve, reject){
+                axios.get(`http://localhost:${props.userSettings.General.port}/is_valid_path`,{ params: {path: settingsJSON.Downloads.download_path}}).then(
+                    response => resolve(response)
+                );
+            });
+        }
+        let responseData = await path_response();
+        console.log(responseData.data);
+    }
 
     function General(){
         return (
@@ -143,12 +157,18 @@ function Settings(props){
     }
 
     function DownloadOptions(){
-        console.log(downloadSwitch);
-    
+
+        function setDownloadType(e){
+            setSettingsJSON({...settingsJSON, Downloads: {
+                ...settingsJSON.Downloads, 
+                download_type: e.currentTarget.value,
+            }})
+        }
+
         return (
             <div>
-                <SubHeader title="Audio"/>
-                <Container fluid style={{width: "100%"}}>
+                <SubHeader title="General"/>
+                <Container fluid style={{width: "100%", paddingBottom: "5rem"}}>
                     <Row>
                         <Col xs={3}>
                             <h5>Download Location</h5>
@@ -161,9 +181,9 @@ function Settings(props){
                                     id = "test1"
                                     variant="outline-primary"
                                     name="radio"
-                                    value="1"
-                                    checked={downloadSwitch[0] === "1"}
-                                    onChange={(e) => setDownloadSwitch([e.currentTarget.value,downloadSwitch[1]])}
+                                    value="prompt"
+                                    checked={settingsJSON.Downloads.download_type === "prompt"}
+                                    onChange={setDownloadType}
                                 >
                                     Prompt me
                                 </ToggleButton>
@@ -173,24 +193,29 @@ function Settings(props){
                                     id="test2"
                                     variant="outline-info"
                                     name="radio"
-                                    value="2"
-                                    checked={downloadSwitch[0] === "2"}
-                                    onChange={(e) => setDownloadSwitch([e.currentTarget.value,downloadSwitch[1]])}
+                                    value="set"
+                                    checked={settingsJSON.Downloads.download_type === "set"}
+                                    onChange={setDownloadType}
                                 >
                                     Set Path
                                 </ToggleButton>
                             </ButtonGroup>
-                            <Stack hidden={downloadSwitch[0] === "1"} direction="horizontal" style={{ paddingTop: "1rem"}} gap={2}>
+                            <Stack hidden={settingsJSON.Downloads.download_type === "prompt"} direction="horizontal" style={{ paddingTop: "1rem"}} gap={2}>
                                 <Form style={{width: "35%"}}>
-                                    <Form.Control type="text" placeholder="Please enter a file path" defaultValue={props.userSettings.Downloads.audio.download_path} onChange={e => console.log(e.target.value)}>
+                                    <Form.Control type="text" placeholder="Please enter a file path" defaultValue={settingsJSON.Downloads.download_path} 
+                                    onChange={e => {
+                                        setSettingsJSON({...settingsJSON, Downloads: {...settingsJSON.Downloads, download_path: e.currentTarget.value}});
+                                        }} 
+                                    disabled={settingsJSON.Downloads.download_type === "prompt"} autoFocus>
                                     </Form.Control>
                                 </Form>
-                                <Button type="submit" variant="warning">Check path</Button>
+                                <Button type="submit" variant="warning" disabled={settingsJSON.Downloads.download_type === "prompt"} onClick={e => {
+                                    checkPath();
+                                }}>Check path</Button>
                             </Stack>
                         </Col>
                     </Row>
                 </Container>
-                <SubHeader title="Video"/>
             </div>
         );
     }
@@ -280,6 +305,7 @@ function Settings(props){
                             <Button variant="danger" className="settings_button" type="submit" onClick={e => {setApplyingDefault(true);handleShow();}}><b>Reset to Default</b></Button>
                             <Button variant="success" className="apply_button" type="submit" onClick={e => {
                                 setApplyingDefault(false);
+                                checkPath()
                                 if(isValidPort(customPort)){
                                     setShowPortError(false);
                                     handleShow();

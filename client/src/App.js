@@ -31,14 +31,8 @@ const defaultUserSettings = {
   },
   Downloads:{
     show_popup: true,
-    audio:{
-      download_type: "prompt",
-      download_path: "",
-    },
-    video:{
-      download_type: "prompt",
-      download_path: "",
-    }
+    download_type: "prompt",
+    download_path: "",
   },
   Converter:{
     show_popup: true,
