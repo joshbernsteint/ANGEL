@@ -6,6 +6,6 @@
 **E**: Electronic-noise   
 **L**: Localizer   
 
-YouTube Downloader for audio and video in Javascript
+Downloader for audio and video in Javascript
 
 This was a horrible idea
