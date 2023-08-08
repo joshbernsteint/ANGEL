@@ -30,7 +30,8 @@ var server_settings = {};
 if(fs.existsSync(settings_path)){
     const fileData = fs.readFileSync(settings_path);
     const settings = JSON.parse(fileData);
-    if(Object.keys(fileData).length){
+
+    if(Object.keys(settings).length){
         port = Number(settings.General.port);
         server_settings = {
             port: port,
@@ -73,6 +74,7 @@ app.get('/is_valid_path', (req,res) => {
 //Used to save config settings from the client
 app.get('/apply_settings', (req,res) => {
     const string_data = JSON.stringify(req.query.settings)
+    console.log("Trying to apply...");
     fs.writeFileSync(settings_path,string_data);
     server_settings = {
         ...server_settings,
@@ -94,7 +96,7 @@ app.get('/get_settings', (req,res) => {
                 res.send(user_settings);
             }
             else{
-                console.log('Sending Error');
+                console.log('GetSettings Error');
                 res.send({error: true})
             }
         } catch (error) {

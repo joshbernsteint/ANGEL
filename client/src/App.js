@@ -107,6 +107,7 @@ function App() {
           animation={false}
             backdrop="static"
             keyboard={false}
+            style={{backgroundColor: "red"}}
           >
           <Modal.Header>
             <Modal.Title>Hold up a second!</Modal.Title>
@@ -186,8 +187,8 @@ function App() {
 
 
   return (
-      <Router>
       <div className='main' style={parsedSettings}>
+      <Router>
       <MyNavbar settings={userSettings}/>
         <Routes>
           <Route path="/" exact Component={ Home_Screen }/>
@@ -197,8 +198,8 @@ function App() {
           <Route exact path="/settings" Component={ Settings_Screen}/>
         </Routes>
       <LoadingServer/>
-      </div>
     </Router>
+      </div>
   );
 }
 
