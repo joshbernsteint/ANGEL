@@ -3,7 +3,6 @@ import {
   HashRouter as Router,
   Routes,
   Route,
-  useNavigate,
 } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css"
@@ -26,7 +25,7 @@ const defaultUserSettings = {
   },
   Appearance:{
     settings_window: "General",
-    is_dark_mode: false,
+    is_dark_mode: true,
     text_size: "Medium",
   },
   Downloads:{
@@ -39,8 +38,6 @@ const defaultUserSettings = {
   },
 };
 
-const lightMode = {background: "white", color: "black"};
-const darkMode = {background: "black", color: "white"};
 
 /**
  * Parses a JSON object to be equivalent to a stylesheet
