@@ -138,13 +138,14 @@ function App() {
   // Finds the server port for downloading images
   useEffect(()=>{
     const localPort = JSON.parse(localStorage.getItem('port'));
+    if(localPort === null){
+      localStorage.setItem('port',defaultUserSettings.General.port);
+      localPort = defaultUserSettings.General.port;
+    }
     var curPort = localPort;
     var foundPort = false;
 
     async function findPort(){
-
-      
-
       while(foundPort === false){
         await fetch(`http://localhost:${curPort}/test_connection`).then(res => {
           if(res.status === 200){
@@ -168,6 +169,7 @@ function App() {
     
 
     async function wrapper(){
+
         await findPort();
         await fetch(`http://localhost:${curPort}/get_settings`).then(res => {return res.json()}).then(obj => {
           if('error' in obj){

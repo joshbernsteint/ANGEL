@@ -213,7 +213,7 @@ app.get('/audio/:id/:qual/:name/:format', async (req,res) => {
         // Map audio & video from streams
         '-map', '0:a',
         // Keep encoding
-        '-c:v', 'copy',
+        '-c:a', 'copy',
         // Define output file
         `${fileName}`,
       ], {

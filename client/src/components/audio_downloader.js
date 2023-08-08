@@ -40,7 +40,7 @@ function AudioDownloader(props){
 
     async function downloadAudio(){
         setFileName(`${nameRef.current.value}.${audioType}`)
-        if(props.userSettings.Downloads.audio.download_type === "prompt"){
+        if(true){
             window.location.assign(`http://localhost:${props.port}/audio/${audioData.id}/${audioQuality}/${nameRef.current.value}/${audioType}`);
             console.log(`${fileName} downloaded.`);
             setNotification(true);

@@ -35,8 +35,8 @@ function VideoDownloader(props){
     async function downloadVideo(){
         setFileName(`${nameRef.current.value}.${videoType}`)
 
-
-        if(props.userSettings.Downloads.audio.download_type === "prompt"){
+        //props.userSettings.Downloads.audio.download_type === "prompt"
+        if(true){
             window.location.assign(`http://localhost:${props.port}/video/${videoData.id}/${itag}/${nameRef.current.value}/${videoType}/${audioQuality}`);
             console.log(`${fileName} downloaded.`);
             setNotification(true);
