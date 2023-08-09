@@ -1,11 +1,11 @@
 import { useState, useMemo } from 'react';
 import '../App.css'
 import { FileUploader } from 'react-drag-drop-files'
-import { getFileExtension, getFileSize } from '../tools/utils';
+import { getFileExtension, getFileSize, isDuplicateFile } from '../tools/utils';
 import { Button, OverlayTrigger, Popover } from 'react-bootstrap';
 
 
-
+//Creates a box for uploading files that looks nice
 function uploadBox(isDarkMode){
     return (
     <div className='upload_box'>
@@ -19,23 +19,17 @@ function uploadBox(isDarkMode){
     );
 }
 
+/**
+ * Creates a FileList component, meant to display the data of File objects in `files`
+ * @param {*} props 
+ * @returns: The makeup of a FileList component
+ */
 function FileList(props){
 
-    function isDuplicateFile(file, index, file_list){
-        var retVal = false;
-        file_list.every((el,i) => {
-            if(i !== index){
-                if(el.name === file.name && el.size === file.size && el.lastModified === file.lastModified){
-                    retVal = true;
-                    return false;
-                }
-            }
-            return true;
-        })
-        return retVal;
-    }
-
-
+    /**
+     * Removes the File object at the specified index from `props.files`. This will cause a page reload!
+     * @param {int} index: The index of the File object to be removed 
+     */
     function removeFile(index){
         const list = props.files
         var result = []
@@ -47,6 +41,11 @@ function FileList(props){
         props.setFiles(result)
     }
 
+    /**
+     * A component for each cell in `FileList`
+     * @param {*} props 
+     * @returns A `ListCell` Component
+     */
     function ListCell(props){
         const warning_overlay = (
             <Popover style={{width: "auto"}}>
@@ -109,7 +108,7 @@ function Converter(props){
             file_list.push(element)
         }
         setFiles([...files,...file_list])
-        console.log('Selected files: ',[...files,...file_list]);
+        // console.log('Selected files: ',[...files,...file_list]);
     }
 
 
