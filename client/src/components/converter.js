@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import '../App.css'
 import { FileUploader } from 'react-drag-drop-files'
 import { getFileExtension, getFileSize } from '../tools/utils';
-import { Table } from 'react-bootstrap';
+import { Button, Table } from 'react-bootstrap';
 
 
 
@@ -23,11 +23,16 @@ function FileList(props){
     function ListCell(props){
         return (
             <div className='list_cell'>
-                <b style={{fontSize: "large", marginRight: "10px"}}>Filename: </b>{props.name}
-                <span style={{marginLeft: "100px"}}></span>
-                <div>
+            <table style={{width: "100%"}}>
+                <td>
+                    <b style={{fontSize: "large", marginRight: "10px"}}>Filename: </b>{props.name}<br/>
                     <b style={{fontSize: "large", marginRight: "10px"}}>Size: </b> {getFileSize(props.size)}
-                </div>
+                </td>
+                <td style={{display: "flex", justifyContent: "right", marginLeft: "auto", marginRight: "0px"}}>
+                    <Button as='img' src="./remove_file.png" height="50px" className='cell_image' variant='outline-danger'>
+                    </Button>
+                </td>
+            </table>
             </div>
         )
     }
