@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import '../App.css'
 import { FileUploader } from 'react-drag-drop-files'
 import { getFileExtension, getFileSize, isDuplicateFile } from '../tools/utils';
-import { Button, OverlayTrigger, Popover } from 'react-bootstrap';
+import { Button, OverlayTrigger, Popover, Stack } from 'react-bootstrap';
 
 
 //Creates a box for uploading files that looks nice
@@ -87,11 +87,11 @@ function FileList(props){
 
 
     return (
-        <div className='file_list'>
+        <Stack className='file_list'>
             {props.files.map((el,i) => (
                 <ListCell name={el.name} size={el.size} key={i} index={i} isDupe={isDuplicateFile(el,i,props.files)}/>
             ))}
-        </div>
+        </Stack>
     );
 }
 
@@ -114,7 +114,7 @@ function Converter(props){
 
     return (
         <>
-        <div className="home">
+        <div className="home" style={{position: "fixed", left: "6%"}}>
             <h1>File Converter</h1>
             <FileUploader handleChange={handleChange} multiple={true} hoverTitle={"Drag or drop multiple files of the same type"} children={uploadBox(settings.Appearance.is_dark_mode)} types={accepted_types}/>
         </div>
