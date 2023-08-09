@@ -159,11 +159,19 @@
     position: absolute;
     bottom: 12px;
     right: 5px;
-    border: .1rem solid red;
+    border: .15rem solid red;
     padding: .5rem;
     border-radius: 10px;
 }
-
-.cell_image:hover{
+.cell_image:hover, .cell_image:focus{
     background-color: rgb(149, 19, 19);
+}
+
+.cell_warning{
+    border: .15rem solid #ff9900;
+    bottom: 12px;
+    right: 5px;
+    padding: .5rem;
+    border-radius: 10px;
+    background-color: transparent;
 }

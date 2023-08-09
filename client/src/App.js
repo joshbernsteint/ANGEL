@@ -67,14 +67,14 @@ function App() {
   const [show, setShow] = useState(true);
   const [changeCount, setChangeCount] = useState(-1);
   const [userSettings, setUserSettings] = useState(defaultUserSettings);
-
+  
+  const parsedSettings = parseSettings(userSettings);
   const Home_Screen = () => {return (<Home userSettings={userSettings}/>)};
   const Audio_Screen = () => {return (<AudioDownloader port={port} userSettings={userSettings}/>)};
   const Video_Screen = () => {return (<VideoDownloader port={port} userSettings={userSettings}/>)};
   const Converter_Screen = () => {return (<Converter port={port} userSettings={userSettings}/>)};
   const Settings_Screen = () => {return (<Settings userSettings={userSettings} setUserSettings={setUserSettings} default={defaultUserSettings} />)};
 
-  const parsedSettings = parseSettings(userSettings);
 
   useEffect(() => {
     async function setSettings(){
@@ -107,7 +107,6 @@ function App() {
           animation={false}
             backdrop="static"
             keyboard={false}
-            style={{backgroundColor: "red"}}
           >
           <Modal.Header>
             <Modal.Title>Hold up a second!</Modal.Title>
