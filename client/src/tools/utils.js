@@ -73,6 +73,11 @@ export function isDuplicateFile(file, index, file_list){
     return retVal;
 }
 
+/**
+ * Gets the number of unique file types in the file_list
+ * @param {list} file_list: A list of **File** objects
+ * @returns: A list containing each unique file type, or "None" if the list is empty
+ */
 export function getUniqueFileTypes(file_list){
     var test_set = new Set();
     var result = []
