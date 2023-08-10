@@ -1,9 +1,9 @@
 import { useState, useMemo } from 'react';
 import '../App.css'
 import { FileUploader } from 'react-drag-drop-files'
-import { getFileExtension, getFileSize, getUniqueFileTypes, isDuplicateFile } from '../tools/utils';
+import { getFileExtension, getFileSize, getUniqueFileTypes, isDuplicateFile, removeDuplicates } from '../tools/utils';
 import { Button, Dropdown, DropdownButton, OverlayTrigger, Popover, Stack } from 'react-bootstrap';
-
+import axios from 'axios'
 
 //Creates a box for uploading files that looks nice
 function uploadBox(isDarkMode){
@@ -57,7 +57,7 @@ function FileList(props){
                 <Popover.Header as="h2"><b>{num_warnings} Warning(s)</b></Popover.Header>
                 <Popover.Body>
                     {props.isDupe ? 
-                    (<b style={{fontSize: "medium"}}>Warning: Duplicate file selected</b>) : (<></>)}
+                    (<b style={{fontSize: "medium"}}>Warning: Duplicate file selected. It will be deleted</b>) : (<></>)}
                     {props.isSameExtension && props.isDupe ? (<hr/>) : (<></>)}
                     {props.isSameExtension ? 
                     (<b style={{fontSize: "medium"}}>Warning: Conversion type selected is the same as file type</b>) : (<></>)}
@@ -94,8 +94,33 @@ function FileList(props){
         )
     }
 
+
     function handleConvert(){
-        console.log("Converting!");
+        const port = props.settings.General.port;
+        const BYTE_CHUNK = 1000000;
+        const file_list = removeDuplicates(props.files);
+        console.log("Beginning File Upload...");
+        file_list.forEach((cur_file,i) => {
+            const reader = new FileReader();
+            reader.readAsArrayBuffer(cur_file);
+            reader.onload = async (event) => {
+                const full_file = event.target.result;
+                const num_chunks = Math.ceil(full_file.byteLength / BYTE_CHUNK);
+                for (let chunk_index = 0; chunk_index < num_chunks; chunk_index++) {
+                    const temp_bytes = full_file.slice(chunk_index*BYTE_CHUNK, (chunk_index+1)*BYTE_CHUNK);
+                    await fetch(`http://localhost:${port}/upload_files/${cur_file.name}`,{
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': "application/octet-stream",
+                            'Content-Length': temp_bytes.length,
+                        },
+                        body: temp_bytes
+                    });
+                }
+            }});
+        console.log("All files uploaded!");
+        props.setFiles([]);
+        
     }
 
     return (
@@ -142,6 +167,7 @@ function FileList(props){
 function Converter(props){
     const settings = props.userSettings;
     const [files, setFiles] = useState([]);
+    const [isDownloading, setIsDownloading] = useState(false);
     const accepted_types = ["MP4"]
 
     function handleChange(file){
@@ -161,7 +187,7 @@ function Converter(props){
             <h1>File Converter</h1>
             <FileUploader handleChange={handleChange} multiple={true} hoverTitle={"Drag or drop multiple files of the same type"} children={uploadBox(settings.Appearance.is_dark_mode)} types={accepted_types}/>
         </div>
-        <FileList files={files} setFiles={setFiles} style={props.styleSettings}/>
+        <FileList files={files} setFiles={setFiles} style={props.styleSettings} settings={settings}/>
         </>
     );
 }

@@ -51,6 +51,8 @@ console.log(server_settings);
 
 
 app.use(cors())//Fixes error, idk what the error was, but this fixes it
+app.use(express.json())
+
 app.get('/', (req,res) => {
     res.send('Nothing to see here folks')
 });
@@ -252,6 +254,12 @@ app.get('/audio/:id/:qual/:name/:format', async (req,res) => {
     })
 });
 
+app.post("/upload_files/:fileName", (req,res) => {
+    req.on('data', bytes => {
+        fs.appendFileSync(`Converter/${req.params.fileName}`, bytes);
+    })
+    res.send("Bytes uploaded!");
+});
 
 
 //Finds an available port #

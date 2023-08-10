@@ -90,3 +90,20 @@ export function getUniqueFileTypes(file_list){
     })
     return (result.length === 0) ? "None" : result;
 }
+
+export function removeDuplicates(file_list){
+    var name_set = new Set();
+    var result = [];
+    file_list.forEach((el,i) => {
+        name_set.add(el.name);
+    })
+    
+    file_list.forEach(el => {
+        if(name_set.has(el.name)){
+            result.push(el);
+            name_set.delete(el.name);
+        }
+    })
+
+    return result;
+}
