@@ -94,6 +94,9 @@ function FileList(props){
         )
     }
 
+    function handleConvert(){
+        console.log("Converting!");
+    }
 
     return (
             <Stack direction='horizontal'>
@@ -127,7 +130,7 @@ function FileList(props){
                     <h3 className='conversion_stats'>Input file type(s): {getUniqueFileTypes(props.files)}</h3><br/>
                     <Stack direction='horizontal' gap={2} style={{padding: "1rem", float: "right"}}>
                         <Button variant='danger' size='lg' onClick={() => props.setFiles([])}>Remove All Files</Button>
-                        <Button variant='success' size='lg'>Convert</Button>
+                        <Button variant='success' size='lg' onClick={handleConvert}>Convert</Button>
                     </Stack>    
                 </Stack>
             </Stack>
