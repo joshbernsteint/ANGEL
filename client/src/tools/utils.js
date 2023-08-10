@@ -53,22 +53,35 @@ export function getFileSize(file_size_num, sig_figs=4){
 }
 
 
-    /**
-     * Determines if `file` is a duplicate within `file_list`
-     * @param {File} file: A File object
-     * @param {int} index: The index of `file` in `file_list`
-     * @param {list} file_list: A list of File objects
-     * @returns: **True** if `file` is a duplicate, **False** if it is unique
-     */
-    export function isDuplicateFile(file, index, file_list){
-        var retVal = false;
-        retVal = !file_list.every((el,i) => {
-            if(i !== index){
-                if(el.name === file.name && el.size === file.size && el.lastModified === file.lastModified){
-                    return false;
-                }
+/**
+ * Determines if `file` is a duplicate within `file_list`
+ * @param {File} file: A File object
+ * @param {int} index: The index of `file` in `file_list`
+ * @param {list} file_list: A list of File objects
+ * @returns: **True** if `file` is a duplicate, **False** if it is unique
+ */
+export function isDuplicateFile(file, index, file_list){
+    var retVal = false;
+    retVal = !file_list.every((el,i) => {
+        if(i !== index){
+            if(el.name === file.name && el.size === file.size && el.lastModified === file.lastModified){
+                return false;
             }
-            return true;
-        })
-        return retVal;
-    }
+        }
+        return true;
+    })
+    return retVal;
+}
+
+export function getUniqueFileTypes(file_list){
+    var test_set = new Set();
+    var result = []
+    file_list.forEach(el => {
+        const file_extension = getFileExtension(el.name);
+        if(!test_set.has(file_extension)){
+            result.push(file_extension);
+            test_set.add(file_extension);
+        }
+    })
+    return (result.length === 0) ? "None" : result;
+}

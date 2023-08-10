@@ -50,10 +50,10 @@ else{
 console.log(server_settings);
 
 
+app.use(cors())//Fixes error, idk what the error was, but this fixes it
 app.get('/', (req,res) => {
     res.send('Nothing to see here folks')
 });
-app.use(cors())//Fixes error, idk what the error was, but this fixes it
 
 //Used to test connection to the server
 app.get('/test_connection', (req,res) => {
