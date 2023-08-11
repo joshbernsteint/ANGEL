@@ -12,7 +12,6 @@ const express = require('express');
 const ytdl = require('ytdl-core');
 const ffmpeg = require('ffmpeg-static');
 const cors = require('cors');
-const { log } = require('console');
 
 //Unchanging constants
 const curUser = os.userInfo().username;
@@ -21,16 +20,11 @@ const default_port = 6547;
 const base_download_path = ""
 const settings_path = './userSettings.json';
 const ffmpeg_path = "ffmpeg/ffmpeg.exe";
-const convert_path_base = "Converter/"
 
 
 //Variable fields
 var port = 6547;//Default value for port is 6547
-var uploaded_files = {};
 var server_settings = {};
-
-
-
 
 
 
@@ -55,9 +49,6 @@ else{
         download_path: base_download_path,
     };
 }
-console.log(server_settings);
-
-
 app.use(cors())//Fixes error, idk what the error was, but this fixes it
 app.use(express.json())
 
@@ -84,7 +75,6 @@ app.get('/is_valid_path', (req,res) => {
 //Used to save config settings from the client
 app.get('/apply_settings', (req,res) => {
     const string_data = JSON.stringify(req.query.settings)
-    console.log("Trying to apply...");
     fs.writeFileSync(settings_path,string_data);
     server_settings = {
         ...server_settings,
@@ -156,7 +146,9 @@ app.get('/get_data', async (req,res) => {
     }
 })
 
-//For downloading a video
+/**
+ * API call for downloading video
+ */
 app.get('/video/:id/:itag/:name/:format/:audio', async (req,res) => {
     const fileName = (server_settings.download_type === "prompt") ? `${req.params.name}.${req.params.format}` : `${server_settings.download_path}/${req.params.name}.${req.params.format}`
     const audio = (req.params.audio === "High") ?  ytdl(req.params.id, { quality: 'highestaudio' }): ytdl(req.params.id, { quality: 'lowestaudio' })
@@ -209,7 +201,9 @@ app.get('/video/:id/:itag/:name/:format/:audio', async (req,res) => {
 });
 
 
-//For downloading audio
+/**
+ * API call for downloading audio
+ */
 app.get('/audio/:id/:qual/:name/:format', async (req,res) => {
     const audio = (req.params.qual === "High") ?  ytdl(req.params.id, { quality: 'highestaudio' }): ytdl(req.params.id, { quality: 'lowestaudio' })
     const fileName = (server_settings.download_type === "prompt") ? `${req.params.name}.${req.params.format}` : `${server_settings.download_path}/${req.params.name}.${req.params.format}`
@@ -263,25 +257,46 @@ app.get('/audio/:id/:qual/:name/:format', async (req,res) => {
 });
 
 
-//File Converter functions
 
+/**
+ * 
+ * 
+ * 
+ * 
+ * The rest of the API/function calls (besides the last one) have to do with converting file types.
+ * 
+ * 
+ * 
+ * 
+ */
+
+var uploaded_files = [];
+const convert_path_base = "Converter/"
 const CHUNK_SIZE = 1000000
 
-
+/**
+ * Receives an upload manifest from the frontend detailing what files (and their sizes are about to be sent)
+ */
 app.get("/upload_manifest", (req, res) => {
-    uploaded_files = req.query.files;
-    console.log(uploaded_files);
-    res.send("Manifest received!")
+    req.query.files.forEach(file => {
+        uploaded_files.push({name: file.name, size: parseInt(file.size)})//Converts the file size to an integer so it doens't have to be converted again later
+    })
+    console.log("Received Manifest: ",uploaded_files);
+    res.sendStatus(200,"Manifest received!");
 })
 
-app.post("/upload_files/:fileName", (req,res) => {
 
-        
-        const single_blob = new Promise(resolve => {
-            var num_bytes_processed = 0;
-            req.on('data', bytes => {
+/**
+ * API call to upload a file (or a chunk of a file) to the backend
+ */
+app.post("/upload_files/:fileName", (req,res) => {
+        const single_blob = new Promise(resolve => {//Creates a promise to handle file appending
+            var num_bytes_processed = 0;//The number of bytes processed in the current chunk
+            req.on('data', bytes => {//On the data event
                 num_bytes_processed += bytes.length;
-                fs.appendFileSync(`Converter/${req.params.fileName}`, bytes);
+                fs.appendFileSync(`Converter/${req.params.fileName}`, bytes);//Append the bytes received from the frontend to the file in the backend
+
+                //Find the file in manifest whose name matches the file currently being uploaded
                 var cur_file = {};
                 for (let index = 0; index < uploaded_files.length; index++) {
                     const element = uploaded_files[index];
@@ -290,11 +305,13 @@ app.post("/upload_files/:fileName", (req,res) => {
                         break;
                     }
                 }
-                const result = fs.statSync(path.join(convert_path_base, req.params.fileName)).size >= parseInt(cur_file.size);
-                if(num_bytes_processed >= CHUNK_SIZE){
+
+                //Check to see if the file is at its final length, maybe try to find some way of making this not suck later
+                const result = fs.statSync(path.join(convert_path_base, req.params.fileName)).size >= cur_file.size;
+                if(num_bytes_processed >= CHUNK_SIZE && !result){//If the chunk was successfully appending and the file is not finished uploading (expect more chunks)
                     resolve(false);
                 }
-                else if(result){
+                else if(result){//If the file finished uploading
                     resolve(true);
                 }
             })
@@ -302,24 +319,33 @@ app.post("/upload_files/:fileName", (req,res) => {
 
         single_blob.then(response => {
             if(response){
-                res.sendStatus(201,"Done")
+                res.sendStatus(201,"Done")//If the file finished uploading, send a status of 201 to the frontend
             }
             else{
-                res.send("Still Downloading")
+                res.send("Still Downloading")//If the file did not finish, send a status of 200
             }
         })
 
 });
 
-app.get("/convert_files/:format", (req, res) => {
+/**
+ * Converts the file from their previous format to the format specified by the URL parameter
+ */
+app.get("/convert_files/:format", async (req, res) => {
 
-    const old_files = fs.readdirSync(convert_path_base)
-    var new_files = []
-    for (let index = 0; index < old_files.length; index++) {
-        const element = old_files[index];
-        const cur_ext = element.split('.').pop();
-        new_files.push(element.replace(cur_ext,req.params.format));
+    var old_files = [];
+    var new_files = [];
+    for (let index = 0; index < uploaded_files.length; index++) {
+        const element = uploaded_files[index];
+        const cur_ext = element.name.split('.').pop();
+        old_files.push(element.name);
+        new_files.push(element.name.replace(cur_ext,req.params.format));
     }
+
+    //TODO: Actually convert the files
+
+
+
 
 
 
@@ -331,7 +357,9 @@ app.get("/convert_files/:format", (req, res) => {
     res.send("All good!")
 });
 
-//Finds an available port #
+/**
+ * /Finds an available port # for the server
+ */
 async function findPort(){
     var foundPort = false;
     //Find an open port on the machine, starting at the default value

@@ -121,7 +121,7 @@ function FileList(props){
                 console.log("All files uploaded!");
                 props.setFiles([]);
                 console.log("Converting...");
-                fetch(`http://localhost:${port}/convert_files/${convertType}`).then(res =>  console.log(res.status))
+                await fetch(`http://localhost:${port}/convert_files/${convertType}`)
                 //TODO: Change API call so it doesn't suck
 
             }
