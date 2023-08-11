@@ -1,7 +1,9 @@
 const {app, BrowserWindow } = require('electron');
 const path = require('path');
+const electronInstaller = require('electron-winstaller');
 
 var download_server;
+
 
 const createWindow = () => {
     const win = new BrowserWindow({

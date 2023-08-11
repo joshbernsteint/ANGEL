@@ -12,6 +12,7 @@ const express = require('express');
 const ytdl = require('ytdl-core');
 const ffmpeg = require('ffmpeg-static');
 const cors = require('cors');
+const { log } = require('console');
 
 //Unchanging constants
 const curUser = os.userInfo().username;
@@ -20,11 +21,18 @@ const default_port = 6547;
 const base_download_path = ""
 const settings_path = './userSettings.json';
 const ffmpeg_path = "ffmpeg/ffmpeg.exe";
+const convert_path_base = "Converter/"
 
 
 //Variable fields
 var port = 6547;//Default value for port is 6547
+var uploaded_files = {};
 var server_settings = {};
+
+
+
+
+
 
 //Sets the server_settings JSON from the file, using the default values otherwise
 if(fs.existsSync(settings_path)){
@@ -254,13 +262,70 @@ app.get('/audio/:id/:qual/:name/:format', async (req,res) => {
     })
 });
 
+
+//File Converter functions
+
+const CHUNK_SIZE = 1000000
+
+
+app.get("/upload_manifest", (req, res) => {
+    uploaded_files = req.query.files;
+    console.log(uploaded_files);
+    res.send("Manifest received!")
+})
+
 app.post("/upload_files/:fileName", (req,res) => {
-    req.on('data', bytes => {
-        fs.appendFileSync(`Converter/${req.params.fileName}`, bytes);
-    })
-    res.send("Bytes uploaded!");
+
+        
+        const single_blob = new Promise(resolve => {
+            var num_bytes_processed = 0;
+            req.on('data', bytes => {
+                num_bytes_processed += bytes.length;
+                fs.appendFileSync(`Converter/${req.params.fileName}`, bytes);
+                var cur_file = {};
+                for (let index = 0; index < uploaded_files.length; index++) {
+                    const element = uploaded_files[index];
+                    if(element.name === req.params.fileName){
+                        cur_file = element;
+                        break;
+                    }
+                }
+                const result = fs.statSync(path.join(convert_path_base, req.params.fileName)).size >= parseInt(cur_file.size);
+                if(num_bytes_processed >= CHUNK_SIZE){
+                    resolve(false);
+                }
+                else if(result){
+                    resolve(true);
+                }
+            })
+        })
+
+        single_blob.then(response => {
+            if(response){
+                res.sendStatus(201,"Done")
+            }
+            else{
+                res.send("Still Downloading")
+            }
+        })
+
 });
 
+app.get("/convert_files/:format", (req, res) => {
+
+    const old_files = fs.readdirSync(convert_path_base)
+    var new_files = []
+    for (let index = 0; index < old_files.length; index++) {
+        const element = old_files[index];
+        const cur_ext = element.split('.').pop();
+        new_files.push(element.replace(cur_ext,req.params.format));
+    }
+    // console.log(old_files);
+    // fs.rmSync(path.join(__dirname, convert_path_base),{ recursive: true })
+    // fs.mkdirSync(path.join(__dirname, convert_path_base))
+
+    res.send("All good!")
+});
 
 //Finds an available port #
 async function findPort(){

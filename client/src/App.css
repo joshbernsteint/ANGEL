@@ -146,7 +146,7 @@
     display: inline;
     height: 50%;
     padding-bottom: 5rem;
-    overflow: scroll;
+    overflow: auto;
     width: 50%;
 }
 .list_cell{

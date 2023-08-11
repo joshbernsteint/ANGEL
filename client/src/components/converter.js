@@ -95,12 +95,53 @@ function FileList(props){
         )
     }
 
-
-    function handleConvert(){
+    /**
+     * Handles the communication with the server over the conversion of files from one format to another
+     */
+    async function handleConvert(){
         const port = props.settings.General.port;
         const BYTE_CHUNK = 1000000;
         const file_list = removeDuplicates(props.files);
+        const num_files = file_list.length;
         console.log("Beginning File Upload...");
+
+
+        /**
+         * Calls the backend API to convert cached files if all of the files have been successfully uploaded.
+         * 
+         * Action will only be performed if the index matches the final index of the `File` object list
+         * @param {int} file_num: The index of the current file in the list
+         * @returns Nothing
+         */
+        async function convertFiles(file_num){
+            if((file_num + 1) !== num_files){
+                return;
+            }
+            else{
+                console.log("All files uploaded!");
+                props.setFiles([]);
+                console.log("Converting...");
+                fetch(`http://localhost:${port}/convert_files/${convertType}`).then(res =>  console.log(res.data))
+                //TODO: Change API call so it doesn't suck
+
+            }
+        }
+        async function sendManifest(){
+            var manifest = [];
+            file_list.forEach(el => {
+                manifest.push({name: el.name, size: el.size})
+            })
+            let manifest_send = () => {
+                return new Promise(function(resolve, reject){
+                    axios.get(`http://localhost:${port}/upload_manifest`,{ params: {files: manifest}}).then(
+                        response => resolve(response)
+                    );
+                });
+            }
+            let responseData = await manifest_send();
+        }
+
+        await sendManifest();
         file_list.forEach((cur_file,i) => {
             const reader = new FileReader();
             reader.readAsArrayBuffer(cur_file);
@@ -116,12 +157,11 @@ function FileList(props){
                             'Content-Length': temp_bytes.length,
                         },
                         body: temp_bytes
-                    });
+                    }).then(res => res.status).then(data => console.log(data))
                 }
-            }});
-        console.log("All files uploaded!");
-        props.setFiles([]);
-        
+                // convertFiles(i)
+            }
+        });
     }
 
     return (
@@ -177,7 +217,6 @@ function Converter(props){
             file_list.push(element)
         }
         setFiles([...files,...file_list])
-        // console.log('Selected files: ',[...files,...file_list]);
     }
 
 
