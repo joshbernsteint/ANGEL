@@ -51,7 +51,8 @@ function FileList(props){
      */
     function ListCell(props){
         const num_warnings = props.isDupe + props.isSameExtension;
-
+        const [isDownloading, setIsDownloading] = useState(false);
+        
         const warning_overlay = (
             <Popover style={{width: "auto"}}>
                 <Popover.Header as="h2"><b>{num_warnings} Warning(s)</b></Popover.Header>
@@ -167,7 +168,6 @@ function FileList(props){
 function Converter(props){
     const settings = props.userSettings;
     const [files, setFiles] = useState([]);
-    const [isDownloading, setIsDownloading] = useState(false);
     const accepted_types = ["MP4"]
 
     function handleChange(file){
