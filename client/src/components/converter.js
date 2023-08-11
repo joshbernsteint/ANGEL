@@ -114,14 +114,14 @@ function FileList(props){
          * @returns Nothing
          */
         async function convertFiles(file_num){
-            if((file_num + 1) !== num_files){
+            if(file_num !== num_files){
                 return;
             }
             else{
                 console.log("All files uploaded!");
                 props.setFiles([]);
                 console.log("Converting...");
-                fetch(`http://localhost:${port}/convert_files/${convertType}`).then(res =>  console.log(res.data))
+                fetch(`http://localhost:${port}/convert_files/${convertType}`).then(res =>  console.log(res.status))
                 //TODO: Change API call so it doesn't suck
 
             }
@@ -138,10 +138,11 @@ function FileList(props){
                     );
                 });
             }
-            let responseData = await manifest_send();
+            await manifest_send();
         }
 
         await sendManifest();
+        var num_201 = 0;
         file_list.forEach((cur_file,i) => {
             const reader = new FileReader();
             reader.readAsArrayBuffer(cur_file);
@@ -157,9 +158,13 @@ function FileList(props){
                             'Content-Length': temp_bytes.length,
                         },
                         body: temp_bytes
-                    }).then(res => res.status).then(data => console.log(data))
+                    }).then(res => res.status).then(status =>{
+                        if(status === 201){
+                            num_201++;
+                            convertFiles(num_201)
+                        }
+                    })
                 }
-                // convertFiles(i)
             }
         });
     }

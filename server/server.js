@@ -320,9 +320,13 @@ app.get("/convert_files/:format", (req, res) => {
         const cur_ext = element.split('.').pop();
         new_files.push(element.replace(cur_ext,req.params.format));
     }
-    // console.log(old_files);
-    // fs.rmSync(path.join(__dirname, convert_path_base),{ recursive: true })
-    // fs.mkdirSync(path.join(__dirname, convert_path_base))
+
+
+
+    old_files.forEach(el => {
+        fs.unlinkSync(path.join(__dirname, convert_path_base,el));
+        console.log("Removing file: ", el);
+    })
 
     res.send("All good!")
 });
