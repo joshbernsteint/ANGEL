@@ -53,7 +53,7 @@ function FileList(props){
 
     useEffect(()=>{
         if(curStep.num === numSteps*2){
-            setCurStep({num: curStep.num, label: "Conversion Complete!"})
+            setCurStep({num: curStep.num, label: "Conversion Complete! You may close this window"})
         }
     }, [curStep])
 
@@ -250,7 +250,7 @@ function FileList(props){
                     <ListCell name={el.name} size={el.size} key={i} index={i} isDupe={isDuplicateFile(el,i,props.files)} isSameExtension={getFileExtension(el.name) === convertType.toUpperCase()}/>
                     ))}
                 </Stack>
-                <Stack className='file_list' style={{left: "59%", border: ".5rem solid blue", width: "40rem", height: "21rem", borderRadius: "10px", top: "56%", overflow: "hidden", zIndex: "1"}}>
+                <Stack className='file_list' style={{left: "58%", border: ".5rem solid blue", width: "40rem", height: "36vh", borderRadius: "10px", top: "56%", overflow: "hidden", zIndex: "1"}}>
                     <h2 className='conversion_header'>Conversion Stats & Settings</h2>
                     <h3 className='conversion_stats'>Convert to: </h3>
                     <DropdownButton title={convertType} variant="primary" style={{width: "20%", display: "inline", top: "-1%"}} size='lg'>

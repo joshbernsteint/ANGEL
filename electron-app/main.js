@@ -1,14 +1,14 @@
 const {app, BrowserWindow } = require('electron');
 const path = require('path');
-const electronInstaller = require('electron-winstaller');
+// const electronInstaller = require('electron-winstaller');
 
 var download_server;
 
 
 const createWindow = () => {
     const win = new BrowserWindow({
-        width: 1400,
-        height: 1000,
+        width: 1600,
+        height: 1200,
         icon: __dirname + '/angel.png',
     })
     // win.webContents.openDevTools();
