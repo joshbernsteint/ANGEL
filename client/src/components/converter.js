@@ -27,7 +27,7 @@ function uploadBox(isDarkMode){
 function FileList(props){
     //Used to display conversion progress
     const [isDownloading, setIsDownloading] = useState(false);
-    const [curStep, setCurStep] = useState(0);
+    const [curStep, setCurStep] = useState({num: 0, label: "Uploading Manifest..."});
     const [numSteps, setNumSteps] = useState(2);
 
     //Used for formatting
@@ -51,6 +51,11 @@ function FileList(props){
         props.setFiles(result)
     }
 
+    useEffect(()=>{
+        if(curStep.num === numSteps*2){
+            setCurStep({num: curStep.num, label: "Conversion Complete!"})
+        }
+    }, [curStep])
 
     /**
      * A component for each cell in `FileList`
@@ -123,8 +128,8 @@ function FileList(props){
          * @param {int} file_num: The index of the current file in the list
          * @returns Nothing
          */
-        function convertFiles(file_num){
-            setCurStep(file_num)
+        function convertFiles(file_num, file_name){
+            setCurStep({num: file_num, label: `Uploading file ${file_name}`})
             if(file_num !== num_files){
                 return;
             }
@@ -137,7 +142,7 @@ function FileList(props){
                     fetch(`http://localhost:${port}/convert_file/${el.name}/${convertType}`).then(res => {
                         if(res.status === 200){
                             file_starting++;
-                            setCurStep(file_starting)
+                            setCurStep({num: file_starting, label: `Converting file ${el.name}`})
                         }
                     })
                 })
@@ -184,7 +189,7 @@ function FileList(props){
                     }).then(res => res.status).then(status =>{
                         if(status === 201){
                             num_201++;
-                            convertFiles(num_201);
+                            convertFiles(num_201, cur_file.name);
                         }
                     })
                 }
@@ -216,12 +221,13 @@ function FileList(props){
     return (
             <Stack direction='horizontal'>
                 <Modal
+                    style={{top: "30vh"}}
                     size="lg"
                     show={isDownloading}
-                    onHide={() => {setIsDownloading(false); setCurStep(0); setNumSteps(2)}}
+                    onHide={() => {setIsDownloading(false); setCurStep({num: 0, label: "Uploading Manifest..."}); setNumSteps(2)}}
                     onShow={() => console.log("total steps: ",numSteps)}
                     backdrop="static"
-                    aria-labelledby="example-modal-sizes-title-lg"
+                    aria-labelledby="contained-modal-title-vcenter"
                 >
                     <Modal.Header closeButton>
                         <Modal.Title id="example-modal-sizes-title-lg">
@@ -230,10 +236,11 @@ function FileList(props){
                     </Modal.Header>
                     <Modal.Body>
                         <ProgressBar>
-                            <ProgressBar striped animated now={(curStep >= 1)*10} variant='warning'/>
-                            <ProgressBar striped animated now={maxVal(curStep,numSteps,1,1)*40} variant='info'/>
-                            <ProgressBar striped animated now={maxVal(curStep,numSteps*2,numSteps,1)*50} variant='success'/>
+                            <ProgressBar striped animated now={(curStep.num >= 1)*10} variant='warning'/>
+                            <ProgressBar striped animated now={maxVal(curStep.num,numSteps,1,1)*40} variant='info'/>
+                            <ProgressBar striped animated now={maxVal(curStep.num,numSteps*2,numSteps,1)*50} variant='success'/>
                         </ProgressBar>
+                        <h5 className='conversion_header' style={{textDecoration: "none", paddingBottom: "0rem"}}>{curStep.label}</h5>
                     </Modal.Body>
                 </Modal>
 
