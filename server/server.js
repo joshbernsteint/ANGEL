@@ -12,6 +12,7 @@ const express = require('express');
 const ytdl = require('ytdl-core');
 const ffmpeg = require('ffmpeg-static');
 const cors = require('cors');
+const convert = require('./convert');
 
 //Unchanging constants
 const curUser = os.userInfo().username;
@@ -343,22 +344,24 @@ app.post("/upload_files/:fileName", (req,res) => {
 app.get("/convert_file/:fileName/:format", async (req, res) => {
 
     const file = req.params.fileName;
-    if(!fs.existsSync(path.join(__dirname, convert_path_base,file))){
+    if(!fs.existsSync(path.join(convert_path_base,file))){
         res.sendStatus(100, "File Not found!");
         return;
     }
 
-    const new_file = file.replace(file.split('.').pop(),req.params.format);
+    const cur_ext = file.split('.').pop();
+    const new_file = file.replace(cur_ext,req.params.format);
     //TODO: Actually convert the files
 
     
+    convert(ffmpeg_path,cur_ext,req.params.format,path.join(convert_path_base,file),path.join(convert_path_base,new_file), () => {
+        fs.unlinkSync(path.join( convert_path_base,file));
+        console.log("Removing file: ", file);
+        
+        res.send("All good!")
+    })
     
     
-    
-    fs.unlinkSync(path.join(__dirname, convert_path_base,file));
-    console.log("Removing file: ", file);
-    
-    res.send("All good!")
 });
 
 /**

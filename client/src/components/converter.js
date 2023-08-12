@@ -70,7 +70,7 @@ function FileList(props){
                 <Popover.Header as="h2"><b>{num_warnings} Warning(s)</b></Popover.Header>
                 <Popover.Body>
                     {props.isDupe ? 
-                    (<b style={{fontSize: "medium"}}>Warning: Duplicate file selected. It will be deleted</b>) : (<></>)}
+                    (<b style={{fontSize: "medium"}}>Warning: Duplicate file selected. This may cause problems during conversion.</b>) : (<></>)}
                     {props.isSameExtension && props.isDupe ? (<hr/>) : (<></>)}
                     {props.isSameExtension ? 
                     (<b style={{fontSize: "medium"}}>Warning: Conversion type selected is the same as file type</b>) : (<></>)}
