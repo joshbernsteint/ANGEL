@@ -1,8 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import '../App.css'
 import { FileUploader } from 'react-drag-drop-files'
 import { getFileExtension, getFileSize, getUniqueFileTypes, isDuplicateFile, removeDuplicates } from '../tools/utils';
-import { Button, Dropdown, DropdownButton, OverlayTrigger, Popover, Stack } from 'react-bootstrap';
+import { Button, Dropdown, DropdownButton, OverlayTrigger, Popover, Stack, ProgressBar, Modal } from 'react-bootstrap';
 import axios from 'axios'
 
 //Creates a box for uploading files that looks nice
@@ -25,9 +25,16 @@ function uploadBox(isDarkMode){
  * @returns: The makeup of a FileList component
  */
 function FileList(props){
+    //Used to display conversion progress
+    const [isDownloading, setIsDownloading] = useState(false);
+    const [curStep, setCurStep] = useState(0);
+    const [numSteps, setNumSteps] = useState(2);
+
+    //Used for formatting
     const [convertType, setType] = useState('mp3')
     const audioTypes = ["mp3", "wav", "ogg"];
     const videoTypes = ["mp4", "mov", "mkv"];
+
 
     /**
      * Removes the File object at the specified index from `props.files`. This will cause a page reload!
@@ -44,6 +51,7 @@ function FileList(props){
         props.setFiles(result)
     }
 
+
     /**
      * A component for each cell in `FileList`
      * @param {*} props 
@@ -51,7 +59,6 @@ function FileList(props){
      */
     function ListCell(props){
         const num_warnings = props.isDupe + props.isSameExtension;
-        const [isDownloading, setIsDownloading] = useState(false);
         
         const warning_overlay = (
             <Popover style={{width: "auto"}}>
@@ -104,7 +111,10 @@ function FileList(props){
         const file_list = removeDuplicates(props.files);
         const num_files = file_list.length;
         console.log("Beginning File Upload...");
-
+        setNumSteps(num_files);
+        setIsDownloading(true);
+        
+        
 
         /**
          * Calls the backend API to convert cached files if all of the files have been successfully uploaded.
@@ -113,7 +123,8 @@ function FileList(props){
          * @param {int} file_num: The index of the current file in the list
          * @returns Nothing
          */
-        async function convertFiles(file_num){
+        function convertFiles(file_num){
+            setCurStep(file_num)
             if(file_num !== num_files){
                 return;
             }
@@ -121,9 +132,15 @@ function FileList(props){
                 console.log("All files uploaded!");
                 props.setFiles([]);
                 console.log("Converting...");
-                await fetch(`http://localhost:${port}/convert_files/${convertType}`)
-                //TODO: Change API call so it doesn't suck
-
+                var file_starting = file_num;
+                file_list.forEach(el => {
+                    fetch(`http://localhost:${port}/convert_file/${el.name}/${convertType}`).then(res => {
+                        if(res.status === 200){
+                            file_starting++;
+                            setCurStep(file_starting)
+                        }
+                    })
+                })
             }
         }
         async function sendManifest(){
@@ -142,6 +159,12 @@ function FileList(props){
         }
 
         await sendManifest();
+        /**
+         * Code for uploading the files to the server
+         * 
+         * When file is finished uploading, a code of 201 is received from the server. 
+         * Otherwise, a code of 200 is received if all went well
+         */
         var num_201 = 0;
         file_list.forEach((cur_file,i) => {
             const reader = new FileReader();
@@ -161,7 +184,7 @@ function FileList(props){
                     }).then(res => res.status).then(status =>{
                         if(status === 201){
                             num_201++;
-                            convertFiles(num_201)
+                            convertFiles(num_201);
                         }
                     })
                 }
@@ -169,8 +192,51 @@ function FileList(props){
         });
     }
 
+    /**
+     * Returns the maximum value that can be taken from the parameters
+     * @param {int} numerator: Numerator value
+     * @param {int} denominator: Denominator value
+     * @param {int} greater_than: Value that the numerator must be greater than
+     * @param {int} max_val: Maximum allowed value
+     * @returns: Maximum allowed value
+     */
+    function maxVal(numerator,denominator,greater_than,max_val){
+        const res = numerator/denominator;
+        if(res > max_val){
+            return max_val
+        }
+        else if(numerator > greater_than){
+            return res
+        }
+        else{
+            return 0;
+        }
+    }
+
     return (
             <Stack direction='horizontal'>
+                <Modal
+                    size="lg"
+                    show={isDownloading}
+                    onHide={() => {setIsDownloading(false); setCurStep(0); setNumSteps(2)}}
+                    onShow={() => console.log("total steps: ",numSteps)}
+                    backdrop="static"
+                    aria-labelledby="example-modal-sizes-title-lg"
+                >
+                    <Modal.Header closeButton>
+                        <Modal.Title id="example-modal-sizes-title-lg">
+                            File Conversion in Progress
+                        </Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <ProgressBar>
+                            <ProgressBar striped animated now={(curStep >= 1)*10} variant='warning'/>
+                            <ProgressBar striped animated now={maxVal(curStep,numSteps,1,1)*40} variant='info'/>
+                            <ProgressBar striped animated now={maxVal(curStep,numSteps*2,numSteps,1)*50} variant='success'/>
+                        </ProgressBar>
+                    </Modal.Body>
+                </Modal>
+
                 <Stack className='file_list'>
 
                 {props.files.map((el,i) => (
@@ -227,7 +293,7 @@ function Converter(props){
 
     return (
         <>
-        <div className="home" style={{position: "fixed", left: "6%"}}>
+        <div className="home" style={{width: "100%"}}>
             <h1>File Converter</h1>
             <FileUploader handleChange={handleChange} multiple={true} hoverTitle={"Drag or drop multiple files of the same type"} children={uploadBox(settings.Appearance.is_dark_mode)} types={accepted_types}/>
         </div>

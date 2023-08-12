@@ -278,9 +278,18 @@ const CHUNK_SIZE = 1000000
  * Receives an upload manifest from the frontend detailing what files (and their sizes are about to be sent)
  */
 app.get("/upload_manifest", (req, res) => {
-    req.query.files.forEach(file => {
-        uploaded_files.push({name: file.name, size: parseInt(file.size)})//Converts the file size to an integer so it doens't have to be converted again later
-    })
+    const files = req.query.files;
+    if(files.constructor === [].constructor){
+        files.forEach(file => {
+            uploaded_files.push({name: file.name, size: parseInt(file.size)})//Converts the file size to an integer so it doens't have to be converted again later
+        })
+    }
+    else{
+        for (const key in files) {
+            console.log(key);
+            uploaded_files.push({name: files[key].name, size: parseInt(files[key].size)})
+        }
+    }
     console.log("Received Manifest: ",uploaded_files);
     res.sendStatus(200,"Manifest received!");
 })
@@ -331,29 +340,24 @@ app.post("/upload_files/:fileName", (req,res) => {
 /**
  * Converts the file from their previous format to the format specified by the URL parameter
  */
-app.get("/convert_files/:format", async (req, res) => {
+app.get("/convert_file/:fileName/:format", async (req, res) => {
 
-    var old_files = [];
-    var new_files = [];
-    for (let index = 0; index < uploaded_files.length; index++) {
-        const element = uploaded_files[index];
-        const cur_ext = element.name.split('.').pop();
-        old_files.push(element.name);
-        new_files.push(element.name.replace(cur_ext,req.params.format));
+    const file = req.params.fileName;
+    if(!fs.existsSync(path.join(__dirname, convert_path_base,file))){
+        res.sendStatus(100, "File Not found!");
+        return;
     }
 
+    const new_file = file.replace(file.split('.').pop(),req.params.format);
     //TODO: Actually convert the files
 
-
-
-
-
-
-    old_files.forEach(el => {
-        fs.unlinkSync(path.join(__dirname, convert_path_base,el));
-        console.log("Removing file: ", el);
-    })
-
+    
+    
+    
+    
+    fs.unlinkSync(path.join(__dirname, convert_path_base,file));
+    console.log("Removing file: ", file);
+    
     res.send("All good!")
 });
 

@@ -132,6 +132,7 @@
     width: 100rem;
     border-radius: 20px;
     padding: 1rem;
+    left: 50%;
     top: 0;
     overflow: hidden;
     cursor: pointer;
