@@ -50,6 +50,10 @@ int main(){
 
     STARTUPINFO zip_si;
     PROCESS_INFORMATION zip_pi;
+
+    STARTUPINFO shortcut_si;
+    PROCESS_INFORMATION shortcut_pi;
+    
     string zip_path = install_path + string("\\Angel.zip");
 
     /**
@@ -68,8 +72,6 @@ int main(){
     string extract_call = string("powershell.exe -Command Expand-Archive '")+ zip_path + string("' '") + install_path + string("' \"\"");
     makeProcess(NULL,extract_call.c_str(), zip_si, zip_pi);
     WaitForSingleObject(zip_pi.hProcess, INFINITE);
-    CloseHandle(zip_pi.hProcess);
-    CloseHandle(zip_pi.hThread);
     cout << "Zip file extracted!" << endl << "Removing Zip file..." << endl;
     if(remove(zip_path.c_str()) != 0){
         cout << "Error: Angel.zip was not able to be removed" << endl;
@@ -81,8 +83,14 @@ int main(){
     string shortcut_call = string("powershell.exe -Command $WshShell = New-Object -comObject WScript.Shell; $user = $Env:UserName; $location = 'C:/Users/' + $user + '/OneDrive/Desktop/Angel.lnk';$Shortcut = $WshShell.CreateShortcut($location);$Shortcut.IconLocation = '")
             + install_path + string("\\Angel\\Angel.ico';$Shortcut.TargetPath = '") + install_path + string("\\Angel\\Angel.exe';$Shortcut.Save() \"\"");
     cout << "Creating shortcut..." << endl;
-    makeProcess(NULL,shortcut_call.c_str(), zip_si, zip_pi);
-    WaitForSingleObject(zip_pi.hProcess, INFINITE);
+    makeProcess(NULL,shortcut_call.c_str(), shortcut_si, shortcut_pi);
+    WaitForSingleObject(shortcut_pi.hProcess, INFINITE);
     
+    CloseHandle(zip_pi.hProcess);
+    CloseHandle(zip_pi.hThread);
+    CloseHandle(shortcut_pi.hProcess);
+    CloseHandle(shortcut_pi.hThread);
+
+
     return 0;
 }

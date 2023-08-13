@@ -142,16 +142,14 @@ int _tmain()
     thread_struct.server = &server_pi;
     thread_struct.app = &app_pi;
 
-    thread_handle = CreateThread(NULL,0,maintainServer,&thread_struct,0, NULL);
+    thread_handle = CreateThread(NULL,64,maintainServer,&thread_struct,0, NULL);
+    PRINT("Waiting for something to happen...");
     #endif
 
     
     #ifdef RUN_PROCS
     // Wait until app process exits.
-    while(windowOpened){
-        WaitForSingleObject( app_pi.hProcess, INFINITE ); //Wait for the app to be closed by the user
-        windowOpened = isOpen(window_name);//Checks to see if the app window is still open (in case the wait failed)
-    }
+    WaitForSingleObject( app_pi.hProcess, INFINITE ); //Wait for the app to be closed by the user
     PRINT("Server Terminating"); 
     TerminateProcess(server_pi.hProcess, 0);//Terminates the server/server thread that downloads the videos
     TerminateThread(thread_handle, 0);
