@@ -4,6 +4,8 @@
 #include <iostream>
 #include <Lmcons.h>
 #include <fileapi.h>
+#include <conio.h>
+#include "printing.h"
 using namespace std;
 
 
@@ -44,9 +46,12 @@ int main(){
     
 
     //Locates the Installation directory
+    cout << CYAN << "Welcome to the " << RED << "Angel " << CYAN << "Installation Utility!" << endl;
+    cout << YELLOW << "Press any key to start..." << endl;
+    _getch();
     string install_path = string("C:\\Users\\") + string(username);
     string link = "https://github.com/joshbernsteint/ANGEL/releases/download/v0.1.1/Angel.zip"; //To be replaced with the latest download link
-    cout << "Creating Installation Directory at: " << install_path << endl;
+    cout << CYAN <<"Creating Installation Directory at: " << BASE << install_path << endl;
 
     STARTUPINFO zip_si;
     PROCESS_INFORMATION zip_pi;
@@ -59,11 +64,11 @@ int main(){
     /**
      * For downloading the zip file
     */
-    cout << "Downloading Zip File..." << endl;
+    cout << YELLOW << "Downloading Zip File..." << endl;
     string zip_download_call = string("powershell.exe -Command ")+ string("(new-object System.Net.WebClient).DownloadFile('") + link + string("','") + zip_path + string("') \"\"");
     makeProcess(NULL,zip_download_call.c_str(), zip_si, zip_pi);
     WaitForSingleObject( zip_pi.hProcess, INFINITE);
-    cout << "Zip file download!" << endl << "Extracting zip file...";
+    cout << GREEN << "Zip file downloaded!\n" << endl << YELLOW << "Extracting zip file..." << endl;
 
 
     /**
@@ -72,17 +77,14 @@ int main(){
     string extract_call = string("powershell.exe -Command Expand-Archive '")+ zip_path + string("' '") + install_path + string("' \"\"");
     makeProcess(NULL,extract_call.c_str(), zip_si, zip_pi);
     WaitForSingleObject(zip_pi.hProcess, INFINITE);
-    cout << "Zip file extracted!" << endl << "Removing Zip file..." << endl;
-    if(remove(zip_path.c_str()) != 0){
-        cout << "Error: Angel.zip was not able to be removed" << endl;
-    }
+    cout << GREEN << "Zip file extracted!\n" << endl;
 
     /**
      * Makes the shortcut for the executable
     */
     string shortcut_call = string("powershell.exe -Command $WshShell = New-Object -comObject WScript.Shell; $user = $Env:UserName; $location = 'C:/Users/' + $user + '/OneDrive/Desktop/Angel.lnk';$Shortcut = $WshShell.CreateShortcut($location);$Shortcut.IconLocation = '")
             + install_path + string("\\Angel\\Angel.ico';$Shortcut.TargetPath = '") + install_path + string("\\Angel\\Angel.exe';$Shortcut.Save() \"\"");
-    cout << "Creating shortcut..." << endl;
+    cout << YELLOW << "Creating shortcut..." << endl << BASE;
     makeProcess(NULL,shortcut_call.c_str(), shortcut_si, shortcut_pi);
     WaitForSingleObject(shortcut_pi.hProcess, INFINITE);
     
@@ -91,6 +93,12 @@ int main(){
     CloseHandle(shortcut_pi.hProcess);
     CloseHandle(shortcut_pi.hThread);
 
+    cout << CYAN << "Cleaning things up..." << endl;
+    if(remove(zip_path.c_str()) != 0){
+        cout << RED << "Error: Angel.zip was not able to be removed" << endl;
+    }
+    cout << endl << GREEN << "Installation Complete! You may press any key to exit." << BASE << endl;
+    _getch();
 
     return 0;
 }
