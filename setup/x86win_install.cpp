@@ -45,7 +45,7 @@ int main(){
 
     //Locates the Installation directory
     string install_path = string("C:\\Users\\") + string(username);
-    string link = "https://github.com/joshbernsteint/ANGEL/releases/download/First-Converter/Angel.zip"; //To be replaced with the latest download link
+    string link = "https://github.com/joshbernsteint/ANGEL/releases/download/v0.1.1/Angel.zip"; //To be replaced with the latest download link
     cout << "Creating Installation Directory at: " << install_path << endl;
 
     STARTUPINFO zip_si;
@@ -68,9 +68,9 @@ int main(){
     string extract_call = string("powershell.exe -Command Expand-Archive '")+ zip_path + string("' '") + install_path + string("' \"\"");
     makeProcess(NULL,extract_call.c_str(), zip_si, zip_pi);
     WaitForSingleObject(zip_pi.hProcess, INFINITE);
-    CloseHandle(app_pi.hProcess);
-    CloseHandle(app_pi.hThread);
-    cout << "Zip file extracted!" << endl << "Removing Zip file...";
+    CloseHandle(zip_pi.hProcess);
+    CloseHandle(zip_pi.hThread);
+    cout << "Zip file extracted!" << endl << "Removing Zip file..." << endl;
     if(remove(zip_path.c_str()) != 0){
         cout << "Error: Angel.zip was not able to be removed" << endl;
     }

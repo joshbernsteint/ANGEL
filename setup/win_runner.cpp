@@ -7,12 +7,18 @@ Windows executable to run ANGEL program
 #include <windows.h>
 #include <stdio.h>
 #include <tchar.h>
+#include <Lmcons.h>
+#include <direct.h>
+#include <iostream>
+#include <filesystem>
 
 #define window_name "ANGEL"
 #define server_call_const "./server.exe"
 #define RUN_PROCS 0
 
 #define PRINT(str) printf("%s\n",str) //I'm lazy and don't like writing the f at the end
+
+using namespace std;
 
 /**
  * @struct server_data
@@ -31,12 +37,14 @@ typedef struct server_data {
  * @param args: Command line arguments to the executable
  * @return Integer value representing if the process creation was a success(0) or failure(-1)
 */
-int makeProcess(char* cmd, char* args ,STARTUPINFO &si, PROCESS_INFORMATION &pi){
+int makeProcess(const char* cmd, const char* args ,STARTUPINFO &si, PROCESS_INFORMATION &pi){
+    char* real_cmd = (char*)cmd;
+    char* real_args = (char*)args;
     ZeroMemory( &si, sizeof(si) );
     si.cb = sizeof(si);
     ZeroMemory( &pi, sizeof(pi) );
 
-    if(!CreateProcess(cmd, args, NULL, NULL, 0, CREATE_NO_WINDOW, NULL, NULL, &si, &pi))
+    if(!CreateProcess(real_cmd, real_args, NULL, NULL, 0, CREATE_NO_WINDOW, NULL, NULL, &si, &pi))
     {
         //If there was an error in process creation
         printf("Error: makeProcess failed: %s %s returned an error.\n",cmd, args);
@@ -99,7 +107,12 @@ DWORD maintainServer(LPVOID server_info){
 
 int _tmain()
 {
-    FreeConsole();//Gets rid of the console popup
+
+    char username[UNLEN+1];
+    DWORD username_len = UNLEN+1;
+    GetUserName(username, &username_len);
+
+    string folder_path = string("C:\\Users\\") + string(username) + "\\Angel\\";
 
     STARTUPINFO server_si;
     PROCESS_INFORMATION server_pi;
@@ -110,23 +123,20 @@ int _tmain()
     server_data thread_struct;
     HANDLE thread_handle;
 
-    const char* app_c = "./electron-app.exe";
-    const char* server_c = server_call_const;
+    string app_c = folder_path + string("electron-app.exe");
+    string server_c = folder_path + string("server.exe");
+    chdir(folder_path.c_str());
     bool windowOpened = true;
 
-    char app_call[32];
-    char server_call[64];
-
-    fillArray(app_c,app_call,32);
-    fillArray(server_c,server_call,64);
 
 
 
+    FreeConsole();//Gets rid of the console popup
     // Start the processes. 
     #ifdef RUN_PROCS
     PRINT("Starting Processes");
-    makeProcess(server_call,NULL,server_si,server_pi);
-    makeProcess(app_call,NULL,app_si,app_pi);
+    makeProcess(server_c.c_str(),NULL,server_si,server_pi);
+    makeProcess(app_c.c_str(),NULL,app_si,app_pi);
     PRINT("Processes Created");
 
     thread_struct.server = &server_pi;
