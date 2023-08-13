@@ -67,17 +67,22 @@ int main(){
     */
     string extract_call = string("powershell.exe -Command Expand-Archive '")+ zip_path + string("' '") + install_path + string("' \"\"");
     makeProcess(NULL,extract_call.c_str(), zip_si, zip_pi);
-    WaitForSingleObject( zip_pi.hProcess, INFINITE);
+    WaitForSingleObject(zip_pi.hProcess, INFINITE);
+    CloseHandle(app_pi.hProcess);
+    CloseHandle(app_pi.hThread);
     cout << "Zip file extracted!" << endl << "Removing Zip file...";
     if(remove(zip_path.c_str()) != 0){
         cout << "Error: Angel.zip was not able to be removed" << endl;
     }
 
-    //start powershell.exe -Command $WshShell = New-Object -comObject WScript.Shell; $user = $Env:UserName; $location = 'C:/Users/' + $user + '/OneDrive/Desktop/Angel.lnk';$Shortcut = $WshShell.CreateShortcut($location);$Shortcut.IconLocation = 'D:\Coding\YouTube_Downloader\client\public\angel.ico';$Shortcut.TargetPath = 'D:\Coding\YouTube_Downloader\server\server.exe';$Shortcut.Save() ""
+    /**
+     * Makes the shortcut for the executable
+    */
     string shortcut_call = string("powershell.exe -Command $WshShell = New-Object -comObject WScript.Shell; $user = $Env:UserName; $location = 'C:/Users/' + $user + '/OneDrive/Desktop/Angel.lnk';$Shortcut = $WshShell.CreateShortcut($location);$Shortcut.IconLocation = '")
             + install_path + string("\\Angel\\Angel.ico';$Shortcut.TargetPath = '") + install_path + string("\\Angel\\Angel.exe';$Shortcut.Save() \"\"");
-
+    cout << "Creating shortcut..." << endl;
     makeProcess(NULL,shortcut_call.c_str(), zip_si, zip_pi);
-
+    WaitForSingleObject(zip_pi.hProcess, INFINITE);
+    
     return 0;
 }
