@@ -8,21 +8,20 @@ using namespace std;
 
 
 
-
-
-
 /**
  * Creates a child process
  * @param cmd: Path to the executable
  * @param args: Command line arguments to the executable
  * @return Integer value representing if the process creation was a success(0) or failure(-1)
 */
-int makeProcess(char* cmd,char* args ,STARTUPINFO &si, PROCESS_INFORMATION &pi){
+int makeProcess(const char* cmd,const char* args ,STARTUPINFO &si, PROCESS_INFORMATION &pi){
+    char* real_cmd = (char*)cmd;
+    char* real_args = (char*)args;
     ZeroMemory( &si, sizeof(si) );
     si.cb = sizeof(si);
     ZeroMemory( &pi, sizeof(pi) );
 
-    if(!CreateProcess(cmd, args, NULL, NULL, 0, CREATE_NO_WINDOW, NULL, NULL, &si, &pi))
+    if(!CreateProcess(real_cmd, real_args, NULL, NULL, 0, CREATE_NO_WINDOW, NULL, NULL, &si, &pi))
     {
         //If there was an error in process creation
         printf("Error: makeProcess failed: %s %s returned an error.\n",cmd, args);
@@ -41,13 +40,44 @@ int main(){
     DWORD username_len = UNLEN+1;
     GetUserName(username, &username_len);
 
-    //Creates the Installation directory
-    string base_path = "C:\\Users\\";
-    string install_path = base_path + string(username) + "\\Angel";
-    cout << install_path << endl;
-    CreateDirectory(install_path.c_str(), NULL);
+
+    
+
+    //Locates the Installation directory
+    string install_path = string("C:\\Users\\") + string(username);
+    string link = "https://github.com/joshbernsteint/ANGEL/releases/download/First-Converter/Angel.zip"; //To be replaced with the latest download link
+    cout << "Creating Installation Directory at: " << install_path << endl;
+
+    STARTUPINFO zip_si;
+    PROCESS_INFORMATION zip_pi;
+    string zip_path = install_path + string("\\Angel.zip");
+
+    /**
+     * For downloading the zip file
+    */
+    cout << "Downloading Zip File..." << endl;
+    string zip_download_call = string("powershell.exe -Command ")+ string("(new-object System.Net.WebClient).DownloadFile('") + link + string("','") + zip_path + string("') \"\"");
+    makeProcess(NULL,zip_download_call.c_str(), zip_si, zip_pi);
+    WaitForSingleObject( zip_pi.hProcess, INFINITE);
+    cout << "Zip file download!" << endl << "Extracting zip file...";
 
 
+    /**
+     * For extracting the zip file downloaded beforehand
+    */
+    string extract_call = string("powershell.exe -Command Expand-Archive '")+ zip_path + string("' '") + install_path + string("' \"\"");
+    makeProcess(NULL,extract_call.c_str(), zip_si, zip_pi);
+    WaitForSingleObject( zip_pi.hProcess, INFINITE);
+    cout << "Zip file extracted!" << endl << "Removing Zip file...";
+    if(remove(zip_path.c_str()) != 0){
+        cout << "Error: Angel.zip was not able to be removed" << endl;
+    }
+
+    //start powershell.exe -Command $WshShell = New-Object -comObject WScript.Shell; $user = $Env:UserName; $location = 'C:/Users/' + $user + '/OneDrive/Desktop/Angel.lnk';$Shortcut = $WshShell.CreateShortcut($location);$Shortcut.IconLocation = 'D:\Coding\YouTube_Downloader\client\public\angel.ico';$Shortcut.TargetPath = 'D:\Coding\YouTube_Downloader\server\server.exe';$Shortcut.Save() ""
+    string shortcut_call = string("powershell.exe -Command $WshShell = New-Object -comObject WScript.Shell; $user = $Env:UserName; $location = 'C:/Users/' + $user + '/OneDrive/Desktop/Angel.lnk';$Shortcut = $WshShell.CreateShortcut($location);$Shortcut.IconLocation = '")
+            + install_path + string("\\Angel\\Angel.ico';$Shortcut.TargetPath = '") + install_path + string("\\Angel\\Angel.exe';$Shortcut.Save() \"\"");
+
+    makeProcess(NULL,shortcut_call.c_str(), zip_si, zip_pi);
 
     return 0;
 }

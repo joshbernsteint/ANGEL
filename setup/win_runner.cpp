@@ -31,7 +31,7 @@ typedef struct server_data {
  * @param args: Command line arguments to the executable
  * @return Integer value representing if the process creation was a success(0) or failure(-1)
 */
-int makeProcess(char* cmd,char* args ,STARTUPINFO &si, PROCESS_INFORMATION &pi){
+int makeProcess(char* cmd, char* args ,STARTUPINFO &si, PROCESS_INFORMATION &pi){
     ZeroMemory( &si, sizeof(si) );
     si.cb = sizeof(si);
     ZeroMemory( &pi, sizeof(pi) );
